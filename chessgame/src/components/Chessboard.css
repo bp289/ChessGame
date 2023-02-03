@@ -1,0 +1,25 @@
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 100px);
+  grid-template-rows: repeat(8, 100px);
+  grid-auto-flow: column;
+  background-color: #eda04d;
+  width: 800px;
+  height: 800px;
+}
+
+.light {
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 100px;
+  height: 100px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.dark {
+  background-color: brown;
+  width: 100px;
+  height: 100px;
+  font-size: 30px;
+  text-align: center;
+}
