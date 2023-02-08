@@ -8,7 +8,7 @@ export default function Chessboard() {
     for (let y = 8; y >= 1; y--) {
       const tileClass = (x + y) % 2 === 0 ? "light" : "dark";
       board.push(
-        <span className={tileClass} key={`${xAxis[x - 1]}${y}`}></span>
+        <span className={tileClass} key={`${xAxis[x - 1]}${y}`}> {`${xAxis[x - 1]}${y}`}</span>
       );
     }
   }
