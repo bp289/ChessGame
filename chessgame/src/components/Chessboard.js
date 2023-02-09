@@ -1,16 +1,43 @@
 import "./Chessboard.css";
-const xAxis = ["a", "b", "c", "d", "e", "f", "g", "h"];
+import Tile from "./Tile.js";
+import {useEffect, useState} from "react"
+import {checkMoves} from "../utils/chessUtils.js"
+import {findStyleClass, startBoard} from "../utils/chessBoardUtils.js"
+
 
 export default function Chessboard() {
-  let board = [];
+  const [board, setBoard] = useState(startBoard)
+  const [selectedTile, setSelectedTile] = useState()
+ 
+  const updateBoard = () =>{
+    const validTiles = checkMoves(selectedTile)
 
-  for (let x = 1; x <= 8; x++) {
-    for (let y = 8; y >= 1; y--) {
-      const tileClass = (x + y) % 2 === 0 ? "light" : "dark";
-      board.push(
-        <span className={tileClass} key={`${xAxis[x - 1]}${y}`}> {`${xAxis[x - 1]}${y}`}</span>
-      );
-    }
+      setBoard(board.map( (tile) => {
+        if(tile.value ===  selectedTile.value){
+          return {...tile, "styleClass": `${findStyleClass(tile.x, tile.y)}-selected`}
+        }else {
+          for(let i = 0; i < validTiles.length; i++){
+            if(validTiles[i].x === tile.x  && validTiles[i].y === tile.y){
+              console.log("valid", tile)
+              return {...tile, "styleClass": `${findStyleClass(tile.x, tile.y)}-movable`}
+            }
+          }
+          return {...tile, "styleClass": findStyleClass(tile.x, tile.y)}
+        }
+      }))
+
   }
-  return <div className="board">{board}</div>;
+
+  const selectTile = (tile) => {
+    setSelectedTile(tile)
+  }
+
+  useEffect( () => {
+    if(selectedTile){
+      updateBoard()
+    }
+  }, [selectedTile])
+  return <div className="board">
+    {board.map((e) => <Tile tileData={e} selectTile={selectTile} updateBoard={updateBoard}/>)}
+  </div>;
 }
