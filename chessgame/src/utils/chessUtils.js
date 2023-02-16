@@ -1,50 +1,116 @@
-const checkMoves = (selectedTile) => {
-    if (selectedTile.pieceOnTile.color === "white"){
-      if(selectedTile.pieceOnTile.piece === "pawn"){
-        return [ 
-          {x: selectedTile.x, y: selectedTile.y + 2}, 
-          {x:selectedTile.x, y:selectedTile.y + 1}
-        ]
+const checkMoves = (selectedTile, board) => {
+  const piece = selectedTile.pieceOnTile.piece;
+  return moveMap[piece].findTiles(selectedTile);
+};
+
+const moveMap = {
+  pawn: {
+    findTiles: (selectedTile) => {
+      if (selectedTile.pieceOnTile.color === "white") {
+        return [
+          { x: selectedTile.x, y: selectedTile.y + 2 },
+          { x: selectedTile.x, y: selectedTile.y + 1 },
+        ];
+      } else if (selectedTile.pieceOnTile.color === "black") {
+        return [
+          { x: selectedTile.x, y: selectedTile.y - 2 },
+          { x: selectedTile.x, y: selectedTile.y - 1 },
+        ];
       }
-    }
-
-    if (selectedTile.pieceOnTile.color === "black"){
-      if(selectedTile.pieceOnTile.piece === "pawn"){
-        return [ 
-          {x: selectedTile.x, y: selectedTile.y - 2}, 
-          {x:selectedTile.x, y:selectedTile.y - 1}
-        ]
+    },
+  },
+  knight: { findTiles: (selectedTile, color) => {} },
+  bishop: {
+    findTiles: (selectedTile) => {
+      const tiles = [];
+      for (let i = 1; i <= 7; i++) {
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y - i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y - i,
+        });
       }
-    }
-}
-
-const moveMap = { 
-  pawn: { 
-    white: () => {
-
-    }, 
-    black: () => {
-
-    }
+      return tiles;
+    },
   },
-  knight: () => {
-
+  rook: {
+    findTiles: (selectedTile) => {
+      const tiles = [];
+      for (let i = 1; i <= 7; i++) {
+        tiles.push({
+          x: selectedTile.x,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y,
+        });
+        tiles.push({
+          x: selectedTile.x,
+          y: selectedTile.y - i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y,
+        });
+      }
+      return tiles;
+    },
   },
-  bishop: () => {
-
+  queen: {
+    findTiles: (selectedTile, color) => {
+      const tiles = [];
+      for (let i = 1; i <= 7; i++) {
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y - i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y - i,
+        });
+        tiles.push({
+          x: selectedTile.x,
+          y: selectedTile.y + i,
+        });
+        tiles.push({
+          x: selectedTile.x + i,
+          y: selectedTile.y,
+        });
+        tiles.push({
+          x: selectedTile.x,
+          y: selectedTile.y - i,
+        });
+        tiles.push({
+          x: selectedTile.x - i,
+          y: selectedTile.y,
+        });
+      }
+      return tiles;
+    },
   },
-  rook: () => {
-
-  },
-  queen: () => {
-
-  },
-  king: () => {
-
-  }
-
-}
+  king: { findTiles: (selectedTile, color) => {} },
+};
 
 module.exports = {
-   checkMoves,
-}
+  checkMoves,
+};
