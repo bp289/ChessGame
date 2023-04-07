@@ -1,28 +1,30 @@
-import tile from "../components/Tile";
 import { findStyleClass } from "./chessBoardUtils";
 
-export const showMoves = (selectedTile, board) => {
-  const piece = selectedTile.pieceOnTile;
-  // let legalMoves = moveMap[piece.name].findTiles(selectedTile, pieceDetails);
-
-  // return board.map((tile) => {
-  //   if (tile.value === selectedTile.value) {
-  //     return {
-  //       ...tile,
-  //       styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
-  //     };
-  //   } else {
-  //     for (let i = 0; i < legalMoves.length; i++) {
-  //       if (legalMoves[i].x === tile.x && legalMoves[i].y === tile.y) {
-  //         return {
-  //           ...tile,
-  //           styleClass: `${findStyleClass(tile.x, tile.y)}-movable`,
-  //         };
-  //       }
-  //     }
-  //     return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
-  //   }
-  // });
+export const showMoves = (moves, selectedTile, board) => {
+  console.log(selectedTile.value, moves);
+  moves = moves[selectedTile.pieceOnTile.color][
+    selectedTile.pieceOnTile?.name
+  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
+  console.log(moves);
+  return board.map((tile) => {
+    if (tile.value === selectedTile.value) {
+      return {
+        ...tile,
+        styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
+      };
+    } else {
+      for (let i = 0; i < moves.length; i++) {
+        if (moves[i].x === tile.x && moves[i].y === tile.y) {
+          console.log({ ...tile, styleClass: "movable" });
+          return {
+            ...tile,
+            styleClass: "movable",
+          };
+        }
+      }
+      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+    }
+  });
 };
 
 export const legalMoves = (board) => {
@@ -33,7 +35,6 @@ export const legalMoves = (board) => {
 
   Object.keys(white).forEach((piece) => {
     pieceLocations.white[piece] = white[piece].map((tile) => {
-      console.log(piece);
       return {
         currentlyAt: tile,
         legalMoves: moveMap[piece].findTiles(tile, getBoardDetails(board)),
@@ -53,7 +54,7 @@ export const legalMoves = (board) => {
   return pieceLocations;
 };
 
-export const getBoardDetails = (board) => {
+const getBoardDetails = (board) => {
   const pieceLocation = {
     white: {
       pawn: [],
@@ -92,36 +93,72 @@ export const getBoardDetails = (board) => {
 
 const moveMap = {
   pawn: {
-    findTiles: (currentTile, Locations) => {
+    findTiles: (currentTile, locations) => {
       const legalMoves = [];
       if (currentTile.pieceOnTile.color === "white") {
-        const otherPieces = Locations.white;
-        Object.values(otherPieces).forEach((piece) => {
-          if (currentTile.x + 1 !== piece.x) {
-            return [];
+        if (currentTile.pieceOnTile.firstMove) {
+          legalMoves.push(
+            { x: currentTile.x, y: currentTile.y + 2 },
+            { x: currentTile.x, y: currentTile.y + 1 }
+          );
+        } else {
+          legalMoves.push(
+            { x: currentTile.x, y: currentTile.y + 1 },
+            { x: currentTile.x, y: currentTile.y + 1 }
+          );
+        }
+        const otherPieces = Object.values(locations.white)
+          .flat()
+          .map((e) => {
+            return { x: e.x, y: e.y };
+          });
+
+        [...legalMoves].forEach((validTile) => {
+          for (let i = 0; i < otherPieces.length; i++) {
+            if (
+              otherPieces[i].x === validTile.x &&
+              otherPieces[i].y === validTile.y
+            ) {
+              console.log(validTile, otherPieces[i]);
+              legalMoves.splice(legalMoves.indexOf(validTile), 1);
+            }
           }
         });
-        legalMoves.push(
-          { x: currentTile.x, y: currentTile.y + 2 },
-          { x: currentTile.x, y: currentTile.y + 1 }
-        );
       } else if (currentTile.pieceOnTile.color === "black") {
-        const otherPieces = Locations.white;
-        Object.values(otherPieces).forEach((piece) => {
-          if (currentTile.x + 1 !== piece.x) {
-            return [];
+        if (currentTile.pieceOnTile.firstMove) {
+          legalMoves.push(
+            { x: currentTile.x, y: currentTile.y - 2 },
+            { x: currentTile.x, y: currentTile.y - 1 }
+          );
+        } else {
+          legalMoves.push(
+            { x: currentTile.x, y: currentTile.y - 1 },
+            { x: currentTile.x, y: currentTile.y - 1 }
+          );
+        }
+        const otherPieces = Object.values(locations.black)
+          .flat()
+          .map((e) => {
+            return { x: e.x, y: e.y };
+          });
+
+        [...legalMoves].forEach((validTile) => {
+          for (let i = 0; i < otherPieces.length; i++) {
+            if (
+              otherPieces[i].x === validTile.x &&
+              otherPieces[i].y === validTile.y
+            ) {
+              console.log(validTile, otherPieces[i]);
+              legalMoves.splice(legalMoves.indexOf(validTile), 1);
+            }
           }
         });
-        legalMoves.push(
-          { x: currentTile.x, y: currentTile.y - 2 },
-          { x: currentTile.x, y: currentTile.y - 1 }
-        );
       }
       return legalMoves;
     },
   },
   knight: {
-    findTiles: (selectedTile) => {
+    findTiles: (selectedTile, locations) => {
       const tiles = [];
       tiles.push(
         { x: selectedTile.x - 1, y: selectedTile.y + 2 },
@@ -133,7 +170,39 @@ const moveMap = {
         { x: selectedTile.x + 2, y: selectedTile.y + 1 },
         { x: selectedTile.x - 2, y: selectedTile.y + 1 }
       );
-      return [];
+
+      if (selectedTile.pieceOnTile.color === "white") {
+        const loc = Object.values(locations.white)
+          .flat()
+          .map((e) => {
+            return { x: e.x, y: e.y };
+          });
+        [...tiles].forEach((validTile) => {
+          for (let i = 0; i < loc.length; i++) {
+            if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
+              console.log(validTile, loc[i]);
+              tiles.splice(tiles.indexOf(validTile), 1);
+            }
+          }
+        });
+      }
+
+      if (selectedTile.pieceOnTile.color === "black") {
+        const loc = Object.values(locations.black)
+          .flat()
+          .map((e) => {
+            return { x: e.x, y: e.y };
+          });
+        [...tiles].forEach((validTile) => {
+          for (let i = 0; i < loc.length; i++) {
+            if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
+              console.log(validTile, loc[i]);
+              tiles.splice(tiles.indexOf(validTile), 1);
+            }
+          }
+        });
+      }
+      return tiles;
     },
   },
   bishop: {
@@ -145,37 +214,48 @@ const moveMap = {
         downLeft: { legalMoves: [], blocked: false },
       };
       if (currentTile.pieceOnTile.color === "white") {
-        return getDiagonals(locations.white, directions, currentTile);
+        return getDiagonals(
+          Object.values(locations.white).flat(),
+          directions,
+          currentTile
+        );
       }
 
       if (currentTile.pieceOnTile.color === "black") {
-        return getDiagonals(locations.black, directions, currentTile);
+        return getDiagonals(
+          Object.values(locations.black).flat(),
+          directions,
+          currentTile
+        );
       }
     },
   },
   rook: {
-    findTiles: (selectedTile) => {
+    findTiles: (currentTile, locations) => {
       const tiles = [];
-      for (let i = 1; i <= 7; i++) {
-        tiles.push(
-          {
-            x: selectedTile.x,
-            y: selectedTile.y + i,
-          },
-          {
-            x: selectedTile.x + i,
-            y: selectedTile.y,
-          },
-          {
-            x: selectedTile.x,
-            y: selectedTile.y - i,
-          },
-          {
-            x: selectedTile.x - i,
-            y: selectedTile.y,
-          }
+
+      const directions = {
+        up: { legalMoves: [], blocked: false },
+        down: { legalMoves: [], blocked: false },
+        left: { legalMoves: [], blocked: false },
+        right: { legalMoves: [], blocked: false },
+      };
+      if (currentTile.pieceOnTile.color === "white") {
+        return getStraight(
+          Object.values(locations.white).flat(),
+          directions,
+          currentTile
         );
       }
+
+      if (currentTile.pieceOnTile.color === "black") {
+        return getStraight(
+          Object.values(locations.black).flat(),
+          directions,
+          currentTile
+        );
+      }
+
       return tiles;
     },
   },
@@ -239,40 +319,117 @@ const moveMap = {
   },
 };
 
-function getDiagonals(pieces, directions, currentTile) {
+function getDiagonals(pieceLocations, directions, currentTile) {
   for (let i = 1; i <= 7; i++) {
-    if (!directions.upRight.blocked) {
-      const currentUR = {
-        x: currentTile.x + i,
-        y: currentTile.y + i,
-      };
+    const currentUR = {
+      x: currentTile.x + i,
+      y: currentTile.y + i,
+    };
 
+    const currentUL = {
+      x: currentTile.x - i,
+      y: currentTile.y + i,
+    };
+
+    const currentDR = {
+      x: currentTile.x + i,
+      y: currentTile.y - i,
+    };
+
+    const currentDL = {
+      x: currentTile.x - i,
+      y: currentTile.y - i,
+    };
+    pieceLocations.forEach((location) => {
+      if (location.x === currentUR.x && location.y === currentUR.y) {
+        directions.upRight.blocked = true;
+      }
+      if (location.x === currentUR.x && location.y === currentUR.y) {
+        directions.upRight.blocked = true;
+      }
+      if (location.x === currentUL.x && location.y === currentUL.y) {
+        directions.upLeft.blocked = true;
+      }
+      if (location.x === currentDR.x && location.y === currentDR.y) {
+        directions.downRight.blocked = true;
+      }
+      if (location.x === currentDL.x && location.y === currentDL.y) {
+        directions.downLeft.blocked = true;
+      }
+    });
+    if (!directions.upRight.blocked) {
       directions.upRight.legalMoves.push(currentUR);
     }
     if (!directions.upLeft.blocked) {
-      const currentUL = {
-        x: currentTile.x - i,
-        y: currentTile.y + i,
-      };
-
       directions.upLeft.legalMoves.push(currentUL);
     }
     if (!directions.downRight.blocked) {
-      const currentDR = {
-        x: currentTile.x + i,
-        y: currentTile.y - i,
-      };
-
       directions.downRight.legalMoves.push(currentDR);
     }
     if (!directions.downLeft.blocked) {
-      const currentDR = {
-        x: currentTile.x - i,
-        y: currentTile.y - i,
-      };
-
-      directions.downLeft.legalMoves.push(currentDR);
+      directions.downLeft.legalMoves.push(currentDL);
     }
   }
-  return null;
+
+  return [
+    directions.upRight.legalMoves,
+    directions.downRight.legalMoves,
+    directions.upLeft.legalMoves,
+    directions.downLeft.legalMoves,
+  ].flat();
+}
+
+function getStraight(pieceLocations, directions, currentTile) {
+  for (let i = 1; i <= 7; i++) {
+    const currentUp = {
+      x: currentTile.x,
+      y: currentTile.y + i,
+    };
+    const currentDown = {
+      x: currentTile.x,
+      y: currentTile.y - i,
+    };
+    const currentRight = {
+      x: currentTile.x + i,
+      y: currentTile.y,
+    };
+    const currentLeft = {
+      x: currentTile.x - i,
+      y: currentTile.y,
+    };
+
+    pieceLocations.forEach((location) => {
+      if (location.x === currentUp.x && location.y === currentUp.y) {
+        directions.up.blocked = true;
+      }
+      if (location.x === currentDown.x && location.y === currentDown.y) {
+        directions.down.blocked = true;
+      }
+      if (location.x === currentRight.x && location.y === currentRight.y) {
+        directions.right.blocked = true;
+      }
+      if (location.x === currentLeft.x && location.y === currentLeft.y) {
+        directions.left.blocked = true;
+      }
+    });
+    if (!directions.up.blocked) {
+      directions.up.legalMoves.push(currentUp);
+    }
+    if (!directions.down.blocked) {
+      directions.down.legalMoves.push(currentDown);
+    }
+    if (!directions.right.blocked) {
+      directions.right.legalMoves.push(currentRight);
+    }
+    if (!directions.left.blocked) {
+      directions.left.legalMoves.push(currentLeft);
+    }
+  }
+
+  return [
+    directions.up.legalMoves,
+    directions.down.legalMoves,
+    directions.left.legalMoves,
+    directions.right.legalMoves,
+  ].flat();
 }

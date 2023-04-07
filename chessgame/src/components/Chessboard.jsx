@@ -6,10 +6,13 @@ import { startBoard } from "../utils/chessBoardUtils.js";
 
 export default function Chessboard() {
   const [board, setBoard] = useState(startBoard);
+  const [currentLegalMoves, setcurrentLegalMoves] = useState(
+    legalMoves([...board])
+  );
   const [selectedTile, setSelectedTile] = useState();
 
   const updateBoard = () => {
-    legalMoves(board);
+    setBoard(showMoves(currentLegalMoves, selectedTile, board));
   };
 
   const selectTile = (tile) => {
@@ -22,6 +25,9 @@ export default function Chessboard() {
     }
   }, [selectedTile]);
 
+  useEffect(() => {
+    console.log(currentLegalMoves);
+  }, [currentLegalMoves]);
   return (
     <div className="board">
       {board.map((e) => (
