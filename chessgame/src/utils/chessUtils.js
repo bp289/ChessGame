@@ -1,6 +1,26 @@
-const checkMoves = (selectedTile, board) => {
+import { findStyleClass } from "./chessBoardUtils";
+
+export const showMoves = (selectedTile, board) => {
   const piece = selectedTile.pieceOnTile.piece;
-  return moveMap[piece].findTiles(selectedTile);
+  const legalMoves = moveMap[piece].findTiles(selectedTile);
+  return board.map((tile) => {
+    if (tile.value === selectedTile.value) {
+      return {
+        ...tile,
+        styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
+      };
+    } else {
+      for (let i = 0; i < legalMoves.length; i++) {
+        if (legalMoves[i].x === tile.x && legalMoves[i].y === tile.y) {
+          return {
+            ...tile,
+            styleClass: `${findStyleClass(tile.x, tile.y)}-movable`,
+          };
+        }
+      }
+      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+    }
+  });
 };
 
 const moveMap = {
@@ -19,27 +39,44 @@ const moveMap = {
       }
     },
   },
-  knight: { findTiles: (selectedTile, color) => {} },
+  knight: {
+    findTiles: (selectedTile) => {
+      const tiles = [];
+      tiles.push(
+        { x: selectedTile.x - 1, y: selectedTile.y + 2 },
+        { x: selectedTile.x + 1, y: selectedTile.y + 2 },
+        { x: selectedTile.x - 1, y: selectedTile.y - 2 },
+        { x: selectedTile.x + 1, y: selectedTile.y - 2 },
+        { x: selectedTile.x + 2, y: selectedTile.y - 1 },
+        { x: selectedTile.x - 2, y: selectedTile.y - 1 },
+        { x: selectedTile.x + 2, y: selectedTile.y + 1 },
+        { x: selectedTile.x - 2, y: selectedTile.y + 1 }
+      );
+      return tiles;
+    },
+  },
   bishop: {
     findTiles: (selectedTile) => {
       const tiles = [];
       for (let i = 1; i <= 7; i++) {
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y - i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y - i,
-        });
+        tiles.push(
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y - i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y - i,
+          }
+        );
       }
       return tiles;
     },
@@ -48,22 +85,24 @@ const moveMap = {
     findTiles: (selectedTile) => {
       const tiles = [];
       for (let i = 1; i <= 7; i++) {
-        tiles.push({
-          x: selectedTile.x,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y,
-        });
-        tiles.push({
-          x: selectedTile.x,
-          y: selectedTile.y - i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y,
-        });
+        tiles.push(
+          {
+            x: selectedTile.x,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y,
+          },
+          {
+            x: selectedTile.x,
+            y: selectedTile.y - i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y,
+          }
+        );
       }
       return tiles;
     },
@@ -72,45 +111,58 @@ const moveMap = {
     findTiles: (selectedTile, color) => {
       const tiles = [];
       for (let i = 1; i <= 7; i++) {
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y - i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y - i,
-        });
-        tiles.push({
-          x: selectedTile.x,
-          y: selectedTile.y + i,
-        });
-        tiles.push({
-          x: selectedTile.x + i,
-          y: selectedTile.y,
-        });
-        tiles.push({
-          x: selectedTile.x,
-          y: selectedTile.y - i,
-        });
-        tiles.push({
-          x: selectedTile.x - i,
-          y: selectedTile.y,
-        });
+        tiles.push(
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y - i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y - i,
+          },
+          {
+            x: selectedTile.x,
+            y: selectedTile.y + i,
+          },
+          {
+            x: selectedTile.x + i,
+            y: selectedTile.y,
+          },
+          {
+            x: selectedTile.x,
+            y: selectedTile.y - i,
+          },
+          {
+            x: selectedTile.x - i,
+            y: selectedTile.y,
+          }
+        );
       }
       return tiles;
     },
   },
-  king: { findTiles: (selectedTile, color) => {} },
-};
-
-module.exports = {
-  checkMoves,
+  king: {
+    findTiles: (selectedTile) => {
+      const tiles = [];
+      tiles.push(
+        { x: selectedTile.x + 1, y: selectedTile.y },
+        { x: selectedTile.x + 1, y: selectedTile.y + 1 },
+        { x: selectedTile.x, y: selectedTile.y + 1 },
+        { x: selectedTile.x - 1, y: selectedTile.y + 1 },
+        { x: selectedTile.x - 1, y: selectedTile.y },
+        { x: selectedTile.x - 1, y: selectedTile.y - 1 },
+        { x: selectedTile.x, y: selectedTile.y - 1 },
+        { x: selectedTile.x + 1, y: selectedTile.y - 1 }
+      );
+      return tiles;
+    },
+  },
 };
