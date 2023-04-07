@@ -5,13 +5,12 @@ export default function tile({ tileData, selectTile }) {
       <span
         className={tileData.styleClass}
         onClick={() => {
-          if ("piece" in tileData.pieceOnTile) {
-            console.log("clicked");
+          if ("name" in tileData.pieceOnTile) {
             selectTile(tileData);
           }
         }}
       >
-        {tileData.pieceOnTile.piece}
+        {tileData.pieceOnTile.name}
       </span>
     </>
   );

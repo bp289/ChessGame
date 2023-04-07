@@ -1,8 +1,8 @@
 import { findStyleClass } from "./chessBoardUtils";
 
 export const showMoves = (selectedTile, board) => {
-  const piece = selectedTile.pieceOnTile.piece;
-  const legalMoves = moveMap[piece].findTiles(selectedTile);
+  const piece = selectedTile.pieceOnTile;
+  const legalMoves = moveMap[piece.name].findTiles(selectedTile);
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {

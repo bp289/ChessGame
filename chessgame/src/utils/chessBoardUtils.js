@@ -17,13 +17,13 @@ function findStyleClass(x, y) {
 function findStartPiece(tile) {
   switch (tile[1]) {
     case "2":
-      return { color: "white", piece: "pawn" };
+      return { color: "white", name: "pawn" };
     case "7":
-      return { color: "black", piece: "pawn" };
+      return { color: "black", name: "pawn" };
     case "1":
-      return { color: "white", piece: `${backPieces[tile[0]]}` };
+      return { color: "white", name: `${backPieces[tile[0]]}` };
     case "8":
-      return { color: "black", piece: `${backPieces[tile[0]]}` };
+      return { color: "black", name: `${backPieces[tile[0]]}` };
     default:
       return {};
   }
