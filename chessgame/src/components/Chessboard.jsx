@@ -1,7 +1,7 @@
 import "./Chessboard.css";
 import Tile from "./Tile.jsx";
 import { useEffect, useState } from "react";
-import { showMoves } from "../utils/chessUtils.js";
+import { showMoves, legalMoves, getBoardDetails } from "../utils/chessUtils.js";
 import { startBoard } from "../utils/chessBoardUtils.js";
 
 export default function Chessboard() {
@@ -9,9 +9,7 @@ export default function Chessboard() {
   const [selectedTile, setSelectedTile] = useState();
 
   const updateBoard = () => {
-    const newBoard = showMoves(selectedTile, board);
-
-    setBoard(newBoard);
+    legalMoves(board);
   };
 
   const selectTile = (tile) => {
@@ -23,6 +21,7 @@ export default function Chessboard() {
       updateBoard();
     }
   }, [selectedTile]);
+
   return (
     <div className="board">
       {board.map((e) => (

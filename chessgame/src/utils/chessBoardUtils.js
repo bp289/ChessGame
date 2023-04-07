@@ -16,9 +16,9 @@ function findStyleClass(x, y) {
 
 function findStartPiece(tile) {
   switch (tile[1]) {
-    case "2":
+    case "4":
       return { color: "white", name: "pawn" };
-    case "7":
+    case "5":
       return { color: "black", name: "pawn" };
     case "1":
       return { color: "white", name: `${backPieces[tile[0]]}` };
@@ -28,6 +28,7 @@ function findStartPiece(tile) {
       return {};
   }
 }
+
 const startBoard = () => {
   const board = [];
   for (let x = 1; x <= 8; x++) {
