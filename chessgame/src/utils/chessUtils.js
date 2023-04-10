@@ -1,11 +1,15 @@
+import tile from "../components/Tile";
 import { findStyleClass } from "./chessBoardUtils";
 
 export const showMoves = (moves, selectedTile, board) => {
-  console.log(selectedTile.value, moves);
-  moves = moves[selectedTile.pieceOnTile.color][
-    selectedTile.pieceOnTile?.name
+  if (selectedTile.styleClass.includes("selected")) {
+    return board.map((tile) => {
+      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+    });
+  }
+  moves = moves[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
-  console.log(moves);
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {
@@ -15,7 +19,6 @@ export const showMoves = (moves, selectedTile, board) => {
     } else {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i].x === tile.x && moves[i].y === tile.y) {
-          console.log({ ...tile, styleClass: "movable" });
           return {
             ...tile,
             styleClass: "movable",
@@ -149,7 +152,6 @@ const moveMap = {
         [...tiles].forEach((validTile) => {
           for (let i = 0; i < loc.length; i++) {
             if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
-              console.log(validTile, loc[i]);
               tiles.splice(tiles.indexOf(validTile), 1);
             }
           }
@@ -165,7 +167,6 @@ const moveMap = {
         [...tiles].forEach((validTile) => {
           for (let i = 0; i < loc.length; i++) {
             if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
-              console.log(validTile, loc[i]);
               tiles.splice(tiles.indexOf(validTile), 1);
             }
           }
@@ -282,19 +283,50 @@ const moveMap = {
     },
   },
   king: {
-    findTiles: (selectedTile) => {
-      const tiles = [];
-      tiles.push(
-        { x: selectedTile.x + 1, y: selectedTile.y },
-        { x: selectedTile.x + 1, y: selectedTile.y + 1 },
-        { x: selectedTile.x, y: selectedTile.y + 1 },
-        { x: selectedTile.x - 1, y: selectedTile.y + 1 },
-        { x: selectedTile.x - 1, y: selectedTile.y },
-        { x: selectedTile.x - 1, y: selectedTile.y - 1 },
-        { x: selectedTile.x, y: selectedTile.y - 1 },
-        { x: selectedTile.x + 1, y: selectedTile.y - 1 }
-      );
-      return tiles;
+    findTiles: (currentTile, locations) => {
+      const straightDirections = {
+        up: { legalMoves: [], blocked: false },
+        down: { legalMoves: [], blocked: false },
+        left: { legalMoves: [], blocked: false },
+        right: { legalMoves: [], blocked: false },
+      };
+      const diagonalDirections = {
+        upRight: { legalMoves: [], blocked: false },
+        downRight: { legalMoves: [], blocked: false },
+        upLeft: { legalMoves: [], blocked: false },
+        downLeft: { legalMoves: [], blocked: false },
+      };
+      if (currentTile.pieceOnTile.color === "white") {
+        return [
+          getDiagonals(
+            Object.values(locations.white).flat(),
+            diagonalDirections,
+            currentTile
+          ),
+          getStraight(
+            Object.values(locations.white).flat(),
+            straightDirections,
+            currentTile,
+            1
+          ),
+        ].flat();
+      }
+
+      if (currentTile.pieceOnTile.color === "black") {
+        return [
+          getDiagonals(
+            Object.values(locations.black).flat(),
+            diagonalDirections,
+            currentTile
+          ),
+          getStraight(
+            Object.values(locations.black).flat(),
+            straightDirections,
+            currentTile,
+            1
+          ),
+        ].flat();
+      }
     },
   },
 };

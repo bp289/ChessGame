@@ -11,23 +11,28 @@ export default function Chessboard() {
   );
   const [selectedTile, setSelectedTile] = useState();
 
-  const updateBoard = () => {
-    setBoard(showMoves(currentLegalMoves, selectedTile, board));
+  const updateBoard = (tile) => {
+    setBoard(showMoves(currentLegalMoves, tile, board));
   };
 
   const selectTile = (tile) => {
-    setSelectedTile(tile);
+    if (tile === selectedTile) {
+      setSelectedTile();
+      updateBoard();
+    } else {
+      setSelectedTile(tile);
+      updateBoard(tile);
+    }
   };
 
-  useEffect(() => {
-    if (selectedTile) {
-      updateBoard();
-    }
-  }, [selectedTile]);
+  // useEffect(() => {
+  //   if (selectedTile) {
+  //     console.log(selectedTile);
+  //     updateBoard();
+  //   }
+  // }, [selectedTile]);
 
-  useEffect(() => {
-    console.log(currentLegalMoves);
-  }, [currentLegalMoves]);
+  useEffect(() => {}, [currentLegalMoves]);
   return (
     <div className="board">
       {board.map((e) => (

@@ -275,51 +275,51 @@ const moveMap = {
   },
   king: {
     findTiles: (currentTile, locations) => {
-      const tiles = [];
-      // const straightDirections = {
-      //   up: { legalMoves: [], blocked: false },
-      //   down: { legalMoves: [], blocked: false },
-      //   left: { legalMoves: [], blocked: false },
-      //   right: { legalMoves: [], blocked: false },
-      // };
-      // const diagonalDirections = {
-      //   upRight: { legalMoves: [], blocked: false },
-      //   downRight: { legalMoves: [], blocked: false },
-      //   upLeft: { legalMoves: [], blocked: false },
-      //   downLeft: { legalMoves: [], blocked: false },
-      // };
-      // if (currentTile.pieceOnTile.color === "white") {
-      //   return [
-      //     getDiagonals(
-      //       Object.values(locations.white).flat(),
-      //       diagonalDirections,
-      //       currentTile
-      //     ),
-      //     getStraight(
-      //       Object.values(locations.white).flat(),
-      //       straightDirections,
-      //       currentTile,
-      //       1
-      //     ),
-      //   ].flat();
-      // }
+      const straightDirections = {
+        up: { legalMoves: [], blocked: false },
+        down: { legalMoves: [], blocked: false },
+        left: { legalMoves: [], blocked: false },
+        right: { legalMoves: [], blocked: false },
+      };
+      const diagonalDirections = {
+        upRight: { legalMoves: [], blocked: false },
+        downRight: { legalMoves: [], blocked: false },
+        upLeft: { legalMoves: [], blocked: false },
+        downLeft: { legalMoves: [], blocked: false },
+      };
+      if (currentTile.pieceOnTile.color === "white") {
+        return [
+          getDiagonals(
+            Object.values(locations.white).flat(),
+            diagonalDirections,
+            currentTile,
+            1
+          ),
+          getStraight(
+            Object.values(locations.white).flat(),
+            straightDirections,
+            currentTile,
+            1
+          ),
+        ].flat();
+      }
 
-      // if (currentTile.pieceOnTile.color === "black") {
-      //   return [
-      //     getDiagonals(
-      //       Object.values(locations.black).flat(),
-      //       diagonalDirections,
-      //       currentTile
-      //     ),
-      //     getStraight(
-      //       Object.values(locations.black).flat(),
-      //       straightDirections,
-      //       currentTile,
-      //       1
-      //     ),
-      //   ].flat();
-      // }
-      return tiles;
+      if (currentTile.pieceOnTile.color === "black") {
+        return [
+          getDiagonals(
+            Object.values(locations.black).flat(),
+            diagonalDirections,
+            currentTile,
+            1
+          ),
+          getStraight(
+            Object.values(locations.black).flat(),
+            straightDirections,
+            currentTile,
+            1
+          ),
+        ].flat();
+      }
     },
   },
 };
