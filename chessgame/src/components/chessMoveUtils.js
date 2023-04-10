@@ -1,11 +1,9 @@
 import { findStyleClass } from "./chessBoardUtils";
 
 export const showMoves = (moves, selectedTile, board) => {
-  console.log(selectedTile.value, moves);
   moves = moves[selectedTile.pieceOnTile.color][
     selectedTile.pieceOnTile?.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
-  console.log(moves);
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {
@@ -25,6 +23,31 @@ export const showMoves = (moves, selectedTile, board) => {
       return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
     }
   });
+};
+
+export const pieceMove = (board, pieceToMove, tileToMoveTo, selectedTile) => {
+  if (tileToMoveTo.styleClass === "movable") {
+    return board.map((tile) => {
+      if (tile.value === tileToMoveTo.value) {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+          pieceOnTile: pieceToMove,
+        };
+      } else if (tile.value === selectedTile.value) {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+          pieceOnTile: {},
+        };
+      } else {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+        };
+      }
+    });
+  }
 };
 
 export const legalMoves = (board) => {

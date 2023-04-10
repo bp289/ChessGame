@@ -2,11 +2,6 @@ import tile from "../components/Tile";
 import { findStyleClass } from "./chessBoardUtils";
 
 export const showMoves = (moves, selectedTile, board) => {
-  if (selectedTile.styleClass.includes("selected")) {
-    return board.map((tile) => {
-      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
-    });
-  }
   moves = moves[selectedTile.pieceOnTile?.color][
     selectedTile?.pieceOnTile.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
@@ -30,6 +25,12 @@ export const showMoves = (moves, selectedTile, board) => {
   });
 };
 
+export const unSelect = (board) => {
+  console.log("deselect");
+  return board.map((tile) => {
+    return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+  });
+};
 export const legalMoves = (board) => {
   let pieceLocations = getBoardDetails(board);
 
@@ -57,6 +58,28 @@ export const legalMoves = (board) => {
   return pieceLocations;
 };
 
+export const pieceMove = (board, tileToMoveFrom, tileToMoveTo) => {
+  return board.map((tile) => {
+    if (tileToMoveTo === tile && tileToMoveTo.styleClass === "movable") {
+      return {
+        ...tile,
+        pieceOnTile: tileToMoveFrom.pieceOnTile,
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else if (tile.value === tileToMoveFrom.value) {
+      return {
+        ...tile,
+        pieceOnTile: {},
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else {
+      return {
+        ...tile,
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    }
+  });
+};
 const getBoardDetails = (board) => {
   const pieceLocation = {
     white: {

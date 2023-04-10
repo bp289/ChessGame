@@ -1,28 +1,47 @@
 import "./Chessboard.css";
-export default function tile({ tileData, selectTile }) {
+export default function tile({
+  tileData,
+  selectTile,
+  selectedTile,
+  movePiece,
+  deSelect,
+}) {
   const selectCurrentTile = (tileData) => {
-    if (tileData.pieceOnTile) {
+    if (tileData.pieceOnTile.name) {
       selectTile(tileData);
+    }
+    if (
+      selectedTile &&
+      !tileData.pieceOnTile.name &&
+      tileData.styleClass === "movable"
+    ) {
+      movePiece(tileData);
+    }
+    if (
+      selectedTile &&
+      !tileData.styleClass === "movable" &&
+      !tileData.styleClass === "selected"
+    ) {
+      deSelect();
     }
   };
   return (
-    <>
-      <span
-        className={tileData.styleClass}
-        onMouseDown={() => {
-          console.log("mousedown");
-          selectCurrentTile(tileData);
-        }}
-      >
-        {tileData.pieceOnTile.name && (
-          <img
-            height="20px"
-            src="https://www.pngfind.com/pngs/m/142-1422303_chess-pawn-png-image-chess-pieces-pawn-png.png"
-          ></img>
-        )}
-
-        {tileData.pieceOnTile.name}
-      </span>
-    </>
+    <div
+      className={tileData.styleClass}
+      onMouseDown={() => {
+        console.log(selectedTile);
+        selectCurrentTile(tileData);
+      }}
+      onDragEnter={() => {
+        console.log("MouseEnter");
+      }}
+    >
+      {tileData.pieceOnTile.name && (
+        <img
+          src={require(`../Assets/${tileData.pieceOnTile.color}-${tileData.pieceOnTile.name}.svg.png`)}
+          alt={`${tileData.pieceOnTile.name}-${tileData.pieceOnTile.color}`}
+        />
+      )}
+    </div>
   );
 }
