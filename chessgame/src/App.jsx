@@ -1,11 +1,11 @@
 import logo from "./logo.svg";
 import "./App.css";
 
-import Chessboard from "./components/Chessboard.jsx";
+import Game from "./components/Game/Game";
 function App() {
   return (
     <div className="App">
-      <Chessboard />
+      <Game />
     </div>
   );
 }

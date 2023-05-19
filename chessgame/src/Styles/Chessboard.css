@@ -8,50 +8,39 @@
   height: 800px;
 }
 
-.light {
-  background-color: rgba(255, 255, 255, 0.8);
+.board > * {
   width: 100px;
   height: 100px;
   font-size: 30px;
   text-align: center;
+  @apply select-none;
+}
+
+.board div img {
+  height: 80px;
+  @apply m-2 cursor-pointer select-none object-contain;
+  pointer-events: none;
+}
+.light {
+  background-color: rgba(255, 255, 255, 0.8);
 }
 
 .dark {
-  background-color: sienna;
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
+  background-color: #eda04d;
 }
 
 .dark-selected {
   background-color: rgba(195, 250, 174, 0.603);
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
 }
 
 .light-selected {
   background-color: rgba(195, 250, 174, 0.603);
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
 }
 
 .movable {
   background-color: rgb(188, 242, 149);
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
 }
 
 .dark-movable {
   background-color: rgb(188, 242, 149);
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
 }

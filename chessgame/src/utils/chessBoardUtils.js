@@ -20,7 +20,7 @@ function findStartPiece(tile) {
       return { color: "white", name: "pawn", firstMove: true };
     case "7":
       return { color: "black", name: "pawn", firstMove: true };
-    case "3":
+    case "1":
       return { color: "white", name: `${backPieces[tile[0]]}` };
     case "8":
       return { color: "black", name: `${backPieces[tile[0]]}` };
