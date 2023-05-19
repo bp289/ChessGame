@@ -1,9 +1,8 @@
-import tile from "../components/Tile";
 import { findStyleClass } from "./chessBoardUtils";
 
-export const showLegalMoves = (moves, selectedTile, board) => {
-  moves = moves[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
+export const showMoves = (moves, selectedTile, board) => {
+  moves = moves[selectedTile.pieceOnTile.color][
+    selectedTile.pieceOnTile?.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
@@ -14,6 +13,7 @@ export const showLegalMoves = (moves, selectedTile, board) => {
     } else {
       for (let i = 0; i < moves.length; i++) {
         if (moves[i].x === tile.x && moves[i].y === tile.y) {
+          console.log({ ...tile, styleClass: "movable" });
           return {
             ...tile,
             styleClass: "movable",
@@ -25,11 +25,31 @@ export const showLegalMoves = (moves, selectedTile, board) => {
   });
 };
 
-export const unSelect = (board) => {
-  return board.map((tile) => {
-    return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
-  });
+export const pieceMove = (board, pieceToMove, tileToMoveTo, selectedTile) => {
+  if (tileToMoveTo.styleClass === "movable") {
+    return board.map((tile) => {
+      if (tile.value === tileToMoveTo.value) {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+          pieceOnTile: pieceToMove,
+        };
+      } else if (tile.value === selectedTile.value) {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+          pieceOnTile: {},
+        };
+      } else {
+        return {
+          ...tile,
+          styleClass: findStyleClass(tile.x, tile.y),
+        };
+      }
+    });
+  }
 };
+
 export const legalMoves = (board) => {
   let pieceLocations = getBoardDetails(board);
 
@@ -57,28 +77,6 @@ export const legalMoves = (board) => {
   return pieceLocations;
 };
 
-export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
-  return board.map((tile) => {
-    if (tileToMoveTo === tile && tileToMoveTo.styleClass === "movable") {
-      return {
-        ...tile,
-        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    } else if (tile.value === tileToMoveFrom.value) {
-      return {
-        ...tile,
-        pieceOnTile: {},
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    } else {
-      return {
-        ...tile,
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    }
-  });
-};
 const getBoardDetails = (board) => {
   const pieceLocation = {
     white: {
@@ -226,8 +224,6 @@ const moveMap = {
   },
   rook: {
     findTiles: (currentTile, locations) => {
-      const tiles = [];
-
       const directions = {
         up: { legalMoves: [], blocked: false },
         down: { legalMoves: [], blocked: false },
@@ -251,8 +247,6 @@ const moveMap = {
           7
         );
       }
-
-      return tiles;
     },
   },
   queen: {
@@ -274,8 +268,7 @@ const moveMap = {
           getDiagonals(
             Object.values(locations.white).flat(),
             diagonalDirections,
-            currentTile,
-            7
+            currentTile
           ),
           getStraight(
             Object.values(locations.white).flat(),
@@ -291,8 +284,7 @@ const moveMap = {
           getDiagonals(
             Object.values(locations.black).flat(),
             diagonalDirections,
-            currentTile,
-            7
+            currentTile
           ),
           getStraight(
             Object.values(locations.black).flat(),
@@ -323,7 +315,8 @@ const moveMap = {
           getDiagonals(
             Object.values(locations.white).flat(),
             diagonalDirections,
-            currentTile
+            currentTile,
+            1
           ),
           getStraight(
             Object.values(locations.white).flat(),
@@ -339,7 +332,8 @@ const moveMap = {
           getDiagonals(
             Object.values(locations.black).flat(),
             diagonalDirections,
-            currentTile
+            currentTile,
+            1
           ),
           getStraight(
             Object.values(locations.black).flat(),
@@ -354,7 +348,7 @@ const moveMap = {
 };
 
 function getDiagonals(pieceLocations, directions, currentTile, limit) {
-  for (let i = 1; i <= limit; i++) {
+  for (let i = 1; limit <= 7; i++) {
     const currentUR = {
       x: currentTile.x + i,
       y: currentTile.y + i,
