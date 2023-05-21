@@ -41,6 +41,7 @@ export default function Chessboard() {
     const newBoard = getBoardAfterMove(board, selectedTile, destinationTile);
     setBoard(newBoard);
     setCurrentLegalMoves(legalMoves([...newBoard]));
+    toggleTurn();
   };
 
   useEffect(() => {
@@ -59,8 +60,6 @@ export default function Chessboard() {
   return (
     <>
       <h2>turn:{turn}</h2>
-      <button onClick={toggleTurn}>toggle turn</button>
-
       <div className="board">
         {board.map((e) => (
           <Tile

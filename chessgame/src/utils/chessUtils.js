@@ -1,4 +1,3 @@
-import tile from "../components/Tile";
 import { findStyleClass } from "./chessBoardUtils";
 
 export const showLegalMoves = (moves, selectedTile, board) => {
@@ -26,6 +25,7 @@ export const showLegalMoves = (moves, selectedTile, board) => {
 };
 
 export const unSelect = (board) => {
+  console.log("deselect");
   return board.map((tile) => {
     return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
   });
@@ -127,26 +127,22 @@ const moveMap = {
       };
       const legalMoves = [];
       if (currentTile.pieceOnTile.color === "white") {
-        const otherPieces = Object.values(locations.white)
-          .flat()
-          .map((e) => {
-            return { x: e.x, y: e.y };
-          });
+        const otherPieces = Object.values(locations.white).flat();
+        const enemyPieces = Object.values(locations.black).flat();
         return currentTile.pieceOnTile.firstMove
-          ? getStraight(otherPieces, directions, currentTile, 2)
-          : getStraight(otherPieces, directions, currentTile, 1);
+          ? getStraight(otherPieces, directions, currentTile, 2, enemyPieces)
+          : getStraight(otherPieces, directions, currentTile, 1, enemyPieces);
       } else if (currentTile.pieceOnTile.color === "black") {
         directions.up.blocked = true;
         directions.down.blocked = false;
 
-        const otherPieces = Object.values(locations.black)
-          .flat()
-          .map((e) => {
-            return { x: e.x, y: e.y };
-          });
+        const otherPieces = Object.values(locations.black).flat();
+
+        const enemyPieces = Object.values(locations.white).flat();
+
         return currentTile.pieceOnTile.firstMove
-          ? getStraight(otherPieces, directions, currentTile, 2)
-          : getStraight(otherPieces, directions, currentTile, 1);
+          ? getStraight(otherPieces, directions, currentTile, 2, enemyPieces)
+          : getStraight(otherPieces, directions, currentTile, 1, enemyPieces);
       }
       return legalMoves;
     },
@@ -181,7 +177,7 @@ const moveMap = {
       }
 
       if (selectedTile.pieceOnTile.color === "black") {
-        const loc = Object.values(locations.black)
+        const loc = Object.values(locations.white)
           .flat()
           .map((e) => {
             return { x: e.x, y: e.y };
@@ -205,23 +201,13 @@ const moveMap = {
         upLeft: { legalMoves: [], blocked: false },
         downLeft: { legalMoves: [], blocked: false },
       };
-      if (currentTile.pieceOnTile.color === "white") {
-        return getDiagonals(
-          Object.values(locations.white).flat(),
-          directions,
-          currentTile,
-          7
-        );
-      }
 
-      if (currentTile.pieceOnTile.color === "black") {
-        return getDiagonals(
-          Object.values(locations.black).flat(),
-          directions,
-          currentTile,
-          7
-        );
-      }
+      return getDiagonals(
+        Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+        directions,
+        currentTile,
+        7
+      );
     },
   },
   rook: {
@@ -234,25 +220,18 @@ const moveMap = {
         left: { legalMoves: [], blocked: false },
         right: { legalMoves: [], blocked: false },
       };
-      if (currentTile.pieceOnTile.color === "white") {
-        return getStraight(
-          Object.values(locations.white).flat(),
-          directions,
-          currentTile,
-          7
-        );
-      }
 
-      if (currentTile.pieceOnTile.color === "black") {
-        return getStraight(
-          Object.values(locations.black).flat(),
-          directions,
-          currentTile,
-          7
-        );
-      }
-
-      return tiles;
+      return getStraight(
+        Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+        directions,
+        currentTile,
+        7,
+        Object.values(
+          locations[
+            currentTile.pieceOnTile.color === "black" ? "white" : "black"
+          ]
+        ).flat()
+      );
     },
   },
   queen: {
@@ -269,39 +248,20 @@ const moveMap = {
         upLeft: { legalMoves: [], blocked: false },
         downLeft: { legalMoves: [], blocked: false },
       };
-      if (currentTile.pieceOnTile.color === "white") {
-        return [
-          getDiagonals(
-            Object.values(locations.white).flat(),
-            diagonalDirections,
-            currentTile,
-            7
-          ),
-          getStraight(
-            Object.values(locations.white).flat(),
-            straightDirections,
-            currentTile,
-            7
-          ),
-        ].flat();
-      }
-
-      if (currentTile.pieceOnTile.color === "black") {
-        return [
-          getDiagonals(
-            Object.values(locations.black).flat(),
-            diagonalDirections,
-            currentTile,
-            7
-          ),
-          getStraight(
-            Object.values(locations.black).flat(),
-            straightDirections,
-            currentTile,
-            7
-          ),
-        ].flat();
-      }
+      return [
+        getDiagonals(
+          Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+          diagonalDirections,
+          currentTile,
+          7
+        ),
+        // getStraight(
+        //   Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+        //   straightDirections,
+        //   currentTile,
+        //   7
+        // ),
+      ].flat();
     },
   },
   king: {
@@ -318,37 +278,19 @@ const moveMap = {
         upLeft: { legalMoves: [], blocked: false },
         downLeft: { legalMoves: [], blocked: false },
       };
-      if (currentTile.pieceOnTile.color === "white") {
-        return [
-          getDiagonals(
-            Object.values(locations.white).flat(),
-            diagonalDirections,
-            currentTile
-          ),
-          getStraight(
-            Object.values(locations.white).flat(),
-            straightDirections,
-            currentTile,
-            1
-          ),
-        ].flat();
-      }
-
-      if (currentTile.pieceOnTile.color === "black") {
-        return [
-          getDiagonals(
-            Object.values(locations.black).flat(),
-            diagonalDirections,
-            currentTile
-          ),
-          getStraight(
-            Object.values(locations.black).flat(),
-            straightDirections,
-            currentTile,
-            1
-          ),
-        ].flat();
-      }
+      return [
+        getDiagonals(
+          Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+          diagonalDirections,
+          currentTile
+        ),
+        // getStraight(
+        //   Object.values(locations[currentTile.pieceOnTile.color]).flat(),
+        //   straightDirections,
+        //   currentTile,
+        //   1
+        // ),
+      ].flat();
     },
   },
 };
@@ -413,7 +355,15 @@ function getDiagonals(pieceLocations, directions, currentTile, limit) {
   ].flat();
 }
 
-function getStraight(pieceLocations, directions, currentTile, limit) {
+function getStraight(
+  pieceLocations,
+  directions,
+  currentTile,
+  limit,
+  enemyLocations
+) {
+  const pawn = false;
+  let attackTiles = [];
   for (let i = 1; i <= limit; i++) {
     const currentUp = {
       x: currentTile.x,
@@ -446,6 +396,31 @@ function getStraight(pieceLocations, directions, currentTile, limit) {
         directions.left.blocked = true;
       }
     });
+
+    if (!pawn) {
+      enemyLocations.forEach((location) => {
+        if (location.x === currentUp.x && location.y === currentUp.y) {
+          attackTiles.push({ x: currentUp.x, y: currentUp.y });
+          directions.up.blocked = true;
+        }
+        if (location.x === currentDown.x && location.y === currentDown.y) {
+          attackTiles.push({ x: currentUp.x, y: currentUp.y });
+
+          directions.down.blocked = true;
+        }
+        if (location.x === currentRight.x && location.y === currentRight.y) {
+          attackTiles.push({ x: currentUp.x, y: currentUp.y });
+
+          directions.right.blocked = true;
+        }
+        if (location.x === currentLeft.x && location.y === currentLeft.y) {
+          attackTiles.push({ x: currentUp.x, y: currentUp.y });
+
+          directions.left.blocked = true;
+        }
+      });
+    }
+
     if (!directions.up.blocked) {
       directions.up.legalMoves.push(currentUp);
     }

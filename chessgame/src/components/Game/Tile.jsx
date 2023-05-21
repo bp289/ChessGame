@@ -7,9 +7,12 @@ export default function Tile({
   movePiece,
   deSelect,
 }) {
+  const [turn, toggleTurn] = useTurn();
   const selectCurrentTile = (tileData) => {
     if (tileData.pieceOnTile.name) {
-      selectTile(tileData);
+      if (tileData.pieceOnTile.color === turn) {
+        selectTile(tileData);
+      }
     }
     if (
       selectedTile &&
