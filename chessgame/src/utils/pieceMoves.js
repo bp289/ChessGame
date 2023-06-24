@@ -73,8 +73,7 @@ export const moveMap = {
   rook: {
     findTiles: (currentTile, allyLocations, enemyLocations) => {
       const tiles = [];
-      console.log(allyLocations);
-      console.log(enemyLocations);
+
       const directions = {
         up: { legalMoves: [], attackTile: [], blocked: false },
         down: { legalMoves: [], attackTile: [], blocked: false },
