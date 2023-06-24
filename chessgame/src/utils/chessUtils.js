@@ -1,9 +1,15 @@
 import { findStyleClass } from "./chessBoardUtils";
 import { moveMap } from "./pieceMoves";
 export const showLegalMoves = (moves, selectedTile, board) => {
-  moves = moves[selectedTile.pieceOnTile?.color][
+  const currentMoves = moves[selectedTile.pieceOnTile?.color][
     selectedTile?.pieceOnTile.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
+
+  const attackMoves = moves[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
+  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
+
+  console.log(attackMoves);
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {
@@ -11,11 +17,19 @@ export const showLegalMoves = (moves, selectedTile, board) => {
         styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
       };
     } else {
-      for (let i = 0; i < moves.length; i++) {
-        if (moves[i].x === tile.x && moves[i].y === tile.y) {
+      for (let i = 0; i < currentMoves.length; i++) {
+        if (currentMoves[i].x === tile.x && currentMoves[i].y === tile.y) {
           return {
             ...tile,
             styleClass: "movable",
+          };
+        }
+      }
+      for (let i = 0; i < attackMoves.length; i++) {
+        if (attackMoves[i].x === tile.x && attackMoves[i].y === tile.y) {
+          return {
+            ...tile,
+            styleClass: "takeable",
           };
         }
       }
@@ -39,20 +53,22 @@ export const legalMoves = (board) => {
 
   Object.keys(white).forEach((piece) => {
     pieceLocations.white[piece] = white[piece].map((tile) => {
+      const moveData = moveMap[piece].findTiles(tile, white, black, "white");
       return {
         currentlyAt: tile,
-        legalMoves: moveMap[piece].findTiles(tile, getPieceLocations(board))
-          .moves,
+        legalMoves: moveData.moves,
+        legalAttacks: moveData.attacks,
       };
     });
   });
 
   Object.keys(black).forEach((piece) => {
     pieceLocations.black[piece] = black[piece].map((tile) => {
+      const moveData = moveMap[piece].findTiles(tile, black, white, "black");
       return {
         currentlyAt: tile,
-        legalMoves: moveMap[piece].findTiles(tile, getPieceLocations(board))
-          .moves,
+        legalMoves: moveData.moves,
+        legalAttacks: moveData.attacks,
       };
     });
   });
@@ -106,13 +122,23 @@ const getPieceLocations = (board) => {
   board.forEach((tile) => {
     if (tile.pieceOnTile?.color === "white") {
       if (pieceLocation.white[tile.pieceOnTile.name]) {
-        pieceLocation.white[tile.pieceOnTile.name].push(tile);
+        pieceLocation.white[tile.pieceOnTile.name].push({
+          value: tile.value,
+          x: tile.x,
+          y: tile.y,
+          pieceOnTile: tile.pieceOnTile,
+        });
       }
     }
 
     if (tile.pieceOnTile?.color === "black") {
       if (pieceLocation.black[tile.pieceOnTile.name]) {
-        pieceLocation.black[tile.pieceOnTile.name].push(tile);
+        pieceLocation.black[tile.pieceOnTile.name].push({
+          value: tile.value,
+          x: tile.x,
+          y: tile.y,
+          pieceOnTile: tile.pieceOnTile,
+        });
       }
     }
   });

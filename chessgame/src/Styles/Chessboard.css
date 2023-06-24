@@ -40,6 +40,9 @@
 .movable {
   background-color: rgb(188, 242, 149);
 }
+.takeable {
+  background-color: red;
+}
 
 .dark-movable {
   background-color: rgb(188, 242, 149);
