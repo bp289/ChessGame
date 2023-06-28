@@ -17,7 +17,7 @@ export const showLegalMoves = (moves, selectedTile, board) => {
         styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
       };
     } else {
-      for (let i = 0; i < currentMoves.length; i++) {
+      for (let i = 0; i < currentMoves?.length; i++) {
         if (currentMoves[i].x === tile.x && currentMoves[i].y === tile.y) {
           return {
             ...tile,
@@ -26,7 +26,7 @@ export const showLegalMoves = (moves, selectedTile, board) => {
         }
       }
       for (let i = 0; i < attackMoves.length; i++) {
-        if (attackMoves[i].x === tile.x && attackMoves[i].y === tile.y) {
+        if (attackMoves[i]?.x === tile.x && attackMoves[i]?.y === tile.y) {
           return {
             ...tile,
             styleClass: "takeable",
@@ -48,12 +48,17 @@ export const unSelect = (board) => {
 export const legalMoves = (board) => {
   let pieceLocations = getPieceLocations(board);
 
-  const white = { ...pieceLocations.white };
-  const black = { ...pieceLocations.black };
+  const whiteLoc = { ...pieceLocations.white };
+  const blackLoc = { ...pieceLocations.black };
 
-  Object.keys(white).forEach((piece) => {
-    pieceLocations.white[piece] = white[piece].map((tile) => {
-      const moveData = moveMap[piece].findTiles(tile, white, black, "white");
+  Object.keys(whiteLoc).forEach((piece) => {
+    pieceLocations.white[piece] = whiteLoc[piece].map((tile) => {
+      const moveData = moveMap[piece].findTiles(
+        tile,
+        Object.values(whiteLoc).flat(),
+        Object.values(blackLoc).flat(),
+        "white"
+      );
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
@@ -62,9 +67,14 @@ export const legalMoves = (board) => {
     });
   });
 
-  Object.keys(black).forEach((piece) => {
-    pieceLocations.black[piece] = black[piece].map((tile) => {
-      const moveData = moveMap[piece].findTiles(tile, black, white, "black");
+  Object.keys(blackLoc).forEach((piece) => {
+    pieceLocations.black[piece] = blackLoc[piece].map((tile) => {
+      const moveData = moveMap[piece].findTiles(
+        tile,
+        Object.values(blackLoc).flat(),
+        Object.values(whiteLoc).flat(),
+        "black"
+      );
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
