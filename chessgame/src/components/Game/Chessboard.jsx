@@ -1,7 +1,7 @@
 import "../../Styles/Chessboard.css";
 import { useTurn } from "../../Contexts/TurnContext.js";
 import Tile from "./Tile.jsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   showLegalMoves,
   legalMoves,
@@ -14,8 +14,11 @@ export default function Chessboard() {
   const [turn, toggleTurn] = useTurn();
 
   const [board, setBoard] = useState(startBoard);
-  const [currentLegalMoves, setCurrentLegalMoves] = useState(
-    legalMoves([...board])
+  const [currentLegalMoves, setCurrentLegalMoves] = useState();
+
+  useMemo(
+    () => setCurrentLegalMoves(legalMoves([...board])),
+    [setCurrentLegalMoves]
   );
   const [selectedTile, setSelectedTile] = useState();
 
@@ -45,6 +48,7 @@ export default function Chessboard() {
   };
 
   useEffect(() => {
+    console.log("use effect ran");
     const updateBoard = (tile) => {
       console.log("updating board, the selected tile is", tile);
       setBoard(showLegalMoves(currentLegalMoves, tile, board));
@@ -56,7 +60,7 @@ export default function Chessboard() {
     }
   }, [selectedTile]);
 
-  console.log(turn);
+  console.log("currentTurn", turn);
   return (
     <>
       <h2>turn:{turn}</h2>

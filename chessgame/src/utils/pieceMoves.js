@@ -52,7 +52,7 @@ export const moveMap = {
     },
   },
   knight: {
-    findTiles: (selectedTile, allyLocations, enemyLocations) => {
+    findTiles: (selectedTile, allyLocations, enemyLocations, color) => {
       const tiles = [];
       tiles.push(
         { x: selectedTile.x - 1, y: selectedTile.y + 2 },
@@ -105,9 +105,7 @@ export const moveMap = {
         right: { legalMoves: [], attackTile: [], blocked: false },
       };
 
-      console.log("ally", allyLocations, "enemy", enemyLocations);
-
-      const gaming = getStraight(
+      return getStraight(
         allyLocations,
         enemyLocations,
         directions,
@@ -115,12 +113,10 @@ export const moveMap = {
         7,
         color
       );
-
-      return gaming;
     },
   },
   queen: {
-    findTiles: (currentTile, allyLocations, enemyLocations) => {
+    findTiles: (currentTile, allyLocations, enemyLocations, color) => {
       const straightDirections = {
         up: { legalMoves: [], blocked: false },
         down: { legalMoves: [], blocked: false },
@@ -150,7 +146,7 @@ export const moveMap = {
     },
   },
   king: {
-    findTiles: (currentTile, allyLocations, enemyLocations) => {
+    findTiles: (currentTile, allyLocations, enemyLocations, color) => {
       const straightDirections = {
         up: { legalMoves: [], attackTile: [], blocked: false },
         down: { legalMoves: [], attackTile: [], blocked: false },
@@ -310,9 +306,8 @@ function straightMoveFinder(pieceLocations, directions, currentDir, color) {
       !up.blocked
     ) {
       up.blocked = true;
-      location.pieceOnTile.color !== color
-        ? directions.up.attackTile.push(currentDir.up)
-        : null;
+      if (location.pieceOnTile.color !== color)
+        directions.up.attackTile.push(currentDir.up);
     }
     if (
       location.x === currentDir.down.x &&
@@ -320,9 +315,8 @@ function straightMoveFinder(pieceLocations, directions, currentDir, color) {
       !down.blocked
     ) {
       down.blocked = true;
-      location.pieceOnTile.color !== color
-        ? directions.down.attackTile.push(currentDir.down)
-        : null;
+      if (location.pieceOnTile.color !== color)
+        directions.down.attackTile.push(currentDir.down);
     }
     if (
       location.x === currentDir.right.x &&
@@ -330,9 +324,8 @@ function straightMoveFinder(pieceLocations, directions, currentDir, color) {
       !right.blocked
     ) {
       right.blocked = true;
-      location.pieceOnTile.color !== color
-        ? directions.right.attackTile.push(currentDir.right)
-        : null;
+      if (location.pieceOnTile.color !== color)
+        directions.right.attackTile.push(currentDir.right);
     }
     if (
       location.x === currentDir.left.x &&
@@ -340,9 +333,8 @@ function straightMoveFinder(pieceLocations, directions, currentDir, color) {
       !left.blocked
     ) {
       left.blocked = true;
-      location.pieceOnTile.color !== color
-        ? directions.left.attackTile.push(currentDir.left)
-        : null;
+      if (location.pieceOnTile.color !== color)
+        directions.left.attackTile.push(currentDir.left);
     }
   });
 

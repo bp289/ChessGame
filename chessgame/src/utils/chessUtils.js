@@ -46,6 +46,7 @@ export const unSelect = (board) => {
 };
 
 export const legalMoves = (board) => {
+  console.log("legal moves is being called");
   let pieceLocations = getPieceLocations(board);
 
   const whiteLoc = { ...pieceLocations.white };
