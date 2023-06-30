@@ -63,7 +63,6 @@ export const moveMap = {
         { x: selectedTile.x + 2, y: selectedTile.y + 1 },
         { x: selectedTile.x - 2, y: selectedTile.y + 1 },
       ];
-      const moves = [];
       const attacks = [];
 
       const locations = [allyLocations, enemyLocations].flat();
