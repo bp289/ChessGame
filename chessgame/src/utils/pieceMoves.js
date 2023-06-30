@@ -53,8 +53,7 @@ export const moveMap = {
   },
   knight: {
     findTiles: (selectedTile, allyLocations, enemyLocations, color) => {
-      const tiles = [];
-      tiles.push(
+      const valid = [
         { x: selectedTile.x - 1, y: selectedTile.y + 2 },
         { x: selectedTile.x + 1, y: selectedTile.y + 2 },
         { x: selectedTile.x - 1, y: selectedTile.y - 2 },
@@ -62,37 +61,44 @@ export const moveMap = {
         { x: selectedTile.x + 2, y: selectedTile.y - 1 },
         { x: selectedTile.x - 2, y: selectedTile.y - 1 },
         { x: selectedTile.x + 2, y: selectedTile.y + 1 },
-        { x: selectedTile.x - 2, y: selectedTile.y + 1 }
-      );
+        { x: selectedTile.x - 2, y: selectedTile.y + 1 },
+      ];
+      const moves = [];
+      const attacks = [];
 
-      const loc = allyLocations.flat().map((e) => {
-        return { x: e.x, y: e.y };
-      });
-      [...tiles].forEach((validTile) => {
-        for (let i = 0; i < loc.length; i++) {
-          if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
-            tiles.splice(tiles.indexOf(validTile), 1);
+      const locations = [allyLocations, enemyLocations].flat();
+      locations.forEach((location) => {
+        const current = { x: location.x, y: location.y };
+        if (valid.includes(current)) {
+          console.log(current);
+          if (location.pieceOnTile.color === color) {
+            valid.splice(valid.indexOf(current), 1);
+          } else {
+            valid.splice(valid.indexOf(current), 1);
+            attacks.push(current);
           }
         }
       });
 
-      return tiles;
+      return { moves: valid, attacks: attacks };
     },
   },
   bishop: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
       const directions = {
-        upRight: { legalMoves: [], blocked: false },
-        downRight: { legalMoves: [], blocked: false },
-        upLeft: { legalMoves: [], blocked: false },
-        downLeft: { legalMoves: [], blocked: false },
+        up: { legalMoves: [], attackTile: [], blocked: false },
+        down: { legalMoves: [], attackTile: [], blocked: false },
+        left: { legalMoves: [], attackTile: [], blocked: false },
+        right: { legalMoves: [], attackTile: [], blocked: false },
       };
 
       return getDiagonals(
-        Object.values(allyLocations).flat(),
+        allyLocations,
+        enemyLocations,
         directions,
         currentTile,
-        7
+        7,
+        color
       );
     },
   },
@@ -118,31 +124,40 @@ export const moveMap = {
   queen: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
       const straightDirections = {
-        up: { legalMoves: [], blocked: false },
-        down: { legalMoves: [], blocked: false },
-        left: { legalMoves: [], blocked: false },
-        right: { legalMoves: [], blocked: false },
+        up: { legalMoves: [], attackTile: [], blocked: false },
+        down: { legalMoves: [], attackTile: [], blocked: false },
+        left: { legalMoves: [], attackTile: [], blocked: false },
+        right: { legalMoves: [], attackTile: [], blocked: false },
       };
       const diagonalDirections = {
-        upRight: { legalMoves: [], blocked: false },
-        downRight: { legalMoves: [], blocked: false },
-        upLeft: { legalMoves: [], blocked: false },
-        downLeft: { legalMoves: [], blocked: false },
+        up: { legalMoves: [], attackTile: [], blocked: false },
+        down: { legalMoves: [], attackTile: [], blocked: false },
+        left: { legalMoves: [], attackTile: [], blocked: false },
+        right: { legalMoves: [], attackTile: [], blocked: false },
       };
-      return [
-        getDiagonals(
-          Object.values(allyLocations).flat(),
-          diagonalDirections,
-          currentTile,
-          7
-        ),
-        // getStraight(
-        //   Object.values(locations[currentTile.pieceOnTile.color]).flat(),
-        //   straightDirections,
-        //   currentTile,
-        //   7
-        // ),
-      ].flat();
+
+      const diagonals = getDiagonals(
+        allyLocations,
+        enemyLocations,
+        diagonalDirections,
+        currentTile,
+        7,
+        color
+      );
+
+      const straights = getStraight(
+        allyLocations,
+        enemyLocations,
+        straightDirections,
+        currentTile,
+        7,
+        color
+      );
+
+      return {
+        moves: [diagonals.moves, straights.moves].flat(),
+        attacks: [diagonals.attacks, straights.attacks].flat(),
+      };
     },
   },
   king: {
@@ -154,88 +169,88 @@ export const moveMap = {
         right: { legalMoves: [], attackTile: [], blocked: false },
       };
       const diagonalDirections = {
-        upRight: { legalMoves: [], blocked: false },
-        downRight: { legalMoves: [], blocked: false },
-        upLeft: { legalMoves: [], blocked: false },
-        downLeft: { legalMoves: [], blocked: false },
+        up: { legalMoves: [], attackTile: [], blocked: false },
+        down: { legalMoves: [], attackTile: [], blocked: false },
+        left: { legalMoves: [], attackTile: [], blocked: false },
+        right: { legalMoves: [], attackTile: [], blocked: false },
       };
-      return [
-        getDiagonals(
-          Object.values(allyLocations).flat(),
-          diagonalDirections,
-          currentTile
-        ),
-        // getStraight(
-        //   Object.values(locations[currentTile.pieceOnTile.color]).flat(),
-        //   straightDirections,
-        //   currentTile,
-        //   1
-        // ),
-      ].flat();
+
+      const diagonals = getDiagonals(
+        allyLocations,
+        enemyLocations,
+        diagonalDirections,
+        currentTile,
+        1,
+        color
+      );
+
+      const straights = getStraight(
+        allyLocations,
+        enemyLocations,
+        straightDirections,
+        currentTile,
+        1,
+        color
+      );
+
+      return {
+        moves: [diagonals.moves, straights.moves].flat(),
+        attacks: [diagonals.attacks, straights.attacks].flat(),
+      };
     },
   },
 };
 
-function getDiagonals(pieceLocations, directions, currentTile, limit) {
+function getDiagonals(
+  allyLocations,
+  enemyLocations,
+  directions,
+  currentTile,
+  limit,
+  color
+) {
+  const { up, down, left, right } = directions;
   for (let i = 1; i <= limit; i++) {
-    const currentUR = {
-      x: currentTile.x + i,
-      y: currentTile.y + i,
+    const currentDir = {
+      up: {
+        x: currentTile.x + i,
+        y: currentTile.y + i,
+      },
+      down: {
+        x: currentTile.x - i,
+        y: currentTile.y + i,
+      },
+      right: {
+        x: currentTile.x + i,
+        y: currentTile.y - i,
+      },
+      left: {
+        x: currentTile.x - i,
+        y: currentTile.y - i,
+      },
     };
 
-    const currentUL = {
-      x: currentTile.x - i,
-      y: currentTile.y + i,
-    };
-
-    const currentDR = {
-      x: currentTile.x + i,
-      y: currentTile.y - i,
-    };
-
-    const currentDL = {
-      x: currentTile.x - i,
-      y: currentTile.y - i,
-    };
-    pieceLocations.forEach((location) => {
-      if (location.x === currentUR.x && location.y === currentUR.y) {
-        directions.upRight.blocked = true;
-      }
-      if (location.x === currentUR.x && location.y === currentUR.y) {
-        directions.upRight.blocked = true;
-      }
-      if (location.x === currentUL.x && location.y === currentUL.y) {
-        directions.upLeft.blocked = true;
-      }
-      if (location.x === currentDR.x && location.y === currentDR.y) {
-        directions.downRight.blocked = true;
-      }
-      if (location.x === currentDL.x && location.y === currentDL.y) {
-        directions.downLeft.blocked = true;
-      }
-    });
-    if (!directions.upRight.blocked) {
-      directions.upRight.legalMoves.push(currentUR);
-    }
-    if (!directions.upLeft.blocked) {
-      directions.upLeft.legalMoves.push(currentUL);
-    }
-    if (!directions.downRight.blocked) {
-      directions.downRight.legalMoves.push(currentDR);
-    }
-    if (!directions.downLeft.blocked) {
-      directions.downLeft.legalMoves.push(currentDL);
-    }
+    straightMoveFinder(
+      [allyLocations, enemyLocations].flat(),
+      directions,
+      currentDir,
+      color
+    );
   }
 
   return {
     moves: [
-      directions.upRight.legalMoves,
-      directions.downRight.legalMoves,
-      directions.upLeft.legalMoves,
-      directions.downLeft.legalMoves,
+      up.legalMoves,
+      down.legalMoves,
+      left.legalMoves,
+      right.legalMoves,
     ].flat(),
-    attacks: [],
+    attacks: [
+      up.attackTile,
+      down.attackTile,
+      left.attackTile,
+      right.attackTile,
+    ].flat(),
   };
 }
 
@@ -275,9 +290,6 @@ function getStraight(
       currentDir,
       color
     );
-
-    if (up.blocked) {
-    }
   }
 
   return {
@@ -350,14 +362,4 @@ function straightMoveFinder(pieceLocations, directions, currentDir, color) {
   if (!left.blocked) {
     left.legalMoves.push(currentDir.left);
   }
-}
-
-function straightAttackFinder(enemyLocations, directions, currentDir) {
-  const { up, down, left, right } = directions;
-  const ends = {
-    up: up[up.length - 1],
-    down: down[down.length - 1],
-    right: right[right.length - 1],
-    left: left[right.length - 1],
-  };
 }

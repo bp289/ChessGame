@@ -1,5 +1,6 @@
 import { findStyleClass } from "./chessBoardUtils";
 import { moveMap } from "./pieceMoves";
+
 export const showLegalMoves = (moves, selectedTile, board) => {
   const currentMoves = moves[selectedTile.pieceOnTile?.color][
     selectedTile?.pieceOnTile.name
@@ -9,7 +10,7 @@ export const showLegalMoves = (moves, selectedTile, board) => {
     selectedTile?.pieceOnTile.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
 
-  console.log(attackMoves);
+  console.log("here");
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {
@@ -39,14 +40,12 @@ export const showLegalMoves = (moves, selectedTile, board) => {
 };
 
 export const unSelect = (board) => {
-  console.log("deselect");
   return board.map((tile) => {
     return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
   });
 };
 
 export const legalMoves = (board) => {
-  console.log("legal moves is being called");
   let pieceLocations = getPieceLocations(board);
 
   const whiteLoc = { ...pieceLocations.white };
@@ -54,12 +53,14 @@ export const legalMoves = (board) => {
 
   Object.keys(whiteLoc).forEach((piece) => {
     pieceLocations.white[piece] = whiteLoc[piece].map((tile) => {
+      console.log();
       const moveData = moveMap[piece].findTiles(
         tile,
         Object.values(whiteLoc).flat(),
         Object.values(blackLoc).flat(),
         "white"
       );
+
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,

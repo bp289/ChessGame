@@ -48,7 +48,6 @@ export default function Chessboard() {
   };
 
   useEffect(() => {
-    console.log("use effect ran");
     const updateBoard = (tile) => {
       console.log("updating board, the selected tile is", tile);
       setBoard(showLegalMoves(currentLegalMoves, tile, board));
@@ -60,7 +59,6 @@ export default function Chessboard() {
     }
   }, [selectedTile]);
 
-  console.log("currentTurn", turn);
   return (
     <>
       <h2>turn:{turn}</h2>
