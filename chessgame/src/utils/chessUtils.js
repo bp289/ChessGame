@@ -53,14 +53,12 @@ export const legalMoves = (board) => {
 
   Object.keys(whiteLoc).forEach((piece) => {
     pieceLocations.white[piece] = whiteLoc[piece].map((tile) => {
-      console.log();
       const moveData = moveMap[piece].findTiles(
         tile,
         Object.values(whiteLoc).flat(),
         Object.values(blackLoc).flat(),
         "white"
       );
-
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,

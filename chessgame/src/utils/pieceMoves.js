@@ -53,7 +53,7 @@ export const moveMap = {
   },
   knight: {
     findTiles: (selectedTile, allyLocations, enemyLocations, color) => {
-      const valid = [
+      const tiles = [
         { x: selectedTile.x - 1, y: selectedTile.y + 2 },
         { x: selectedTile.x + 1, y: selectedTile.y + 2 },
         { x: selectedTile.x - 1, y: selectedTile.y - 2 },
@@ -65,21 +65,23 @@ export const moveMap = {
       ];
       const attacks = [];
 
-      const locations = [allyLocations, enemyLocations].flat();
-      locations.forEach((location) => {
-        const current = { x: location.x, y: location.y };
-        if (valid.includes(current)) {
-          console.log(current);
-          if (location.pieceOnTile.color === color) {
-            valid.splice(valid.indexOf(current), 1);
-          } else {
-            valid.splice(valid.indexOf(current), 1);
-            attacks.push(current);
+      const loc = [allyLocations, enemyLocations].flat();
+
+      [...tiles].forEach((validTile) => {
+        for (let i = 0; i < loc.length; i++) {
+          if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
+            if (loc[i].pieceOnTile.color == color) {
+              tiles.splice(tiles.indexOf(validTile), 1);
+            } else {
+              tiles.splice(tiles.indexOf(validTile), 1);
+              attacks.push(validTile);
+            }
           }
         }
       });
 
-      return { moves: valid, attacks: attacks };
+      console.log(attacks);
+      return { moves: tiles, attacks: attacks };
     },
   },
   bishop: {

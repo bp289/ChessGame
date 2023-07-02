@@ -29,6 +29,7 @@ function findStartPiece(tile) {
   }
 }
 
+// y is backwards because the dom travels down
 const startBoard = () => {
   const board = [];
   for (let x = 1; x <= 8; x++) {
