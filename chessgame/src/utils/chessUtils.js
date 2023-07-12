@@ -62,7 +62,6 @@ export const legalMoves = (board) => {
       );
 
       if (moveData.attacks.length) whiteAttacks.push(moveData.attacks);
-
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
@@ -96,7 +95,7 @@ export const legalMoves = (board) => {
       pieceLocations.white.king[0].legalAttacks,
       pieceLocations.white.king[0].legalMoves,
     ].flat(),
-    pieceLocations.white.currentlyAt,
+    pieceLocations.white.king[0].currentlyAt,
     blackAttacks.flat()
   );
   const checksOnBlack = moveMap.king.checkForChecks(
@@ -104,7 +103,7 @@ export const legalMoves = (board) => {
       pieceLocations.black.king[0].legalAttacks,
       pieceLocations.black.king[0].legalMoves,
     ].flat(),
-    pieceLocations.black.currentlyAt,
+    pieceLocations.white.king[0].currentlyAt,
     whiteAttacks.flat()
   );
   return pieceLocations;
