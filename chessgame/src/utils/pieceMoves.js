@@ -267,10 +267,27 @@ export const moveMap = {
         attacks: [diagonals.attacks, straights.attacks].flat(),
       };
     },
-    checkForChecks: (currentMoves, currentLocation, enemyAttacks) => {
+    checkForChecks: (
+      currentMoves,
+      currentLocation,
+      enemyAttacks,
+      enemyMoves
+    ) => {
       const { x, y } = currentLocation;
+      let checkCount = 0;
+      let isInCheck = false;
+      const movesThatCheck = [];
 
-      return { isInCheck: null, movesThatCheck: [] };
+      enemyAttacks.forEach((enemyAttack) => {
+        for (const attack of enemyAttack.attacks) {
+          if (attack.x == x && attack.y == y) {
+            isInCheck = true;
+            checkCount++;
+          }
+        }
+      });
+
+      return { isInCheck, movesThatCheck, checkCount };
     },
   },
 };
