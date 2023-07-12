@@ -20,6 +20,7 @@ export default function Chessboard() {
     () => setCurrentLegalMoves(legalMoves([...board])),
     [setCurrentLegalMoves]
   );
+
   const [selectedTile, setSelectedTile] = useState();
 
   const updateBoard = (tile) => {

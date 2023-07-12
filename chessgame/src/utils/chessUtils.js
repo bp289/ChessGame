@@ -10,7 +10,6 @@ export const showLegalMoves = (moves, selectedTile, board) => {
     selectedTile?.pieceOnTile.name
   ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
 
-  console.log("here");
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
       return {
@@ -51,6 +50,8 @@ export const legalMoves = (board) => {
   const whiteLoc = { ...pieceLocations.white };
   const blackLoc = { ...pieceLocations.black };
 
+  const whiteAttacks = [];
+  const blackAttacks = [];
   Object.keys(whiteLoc).forEach((piece) => {
     pieceLocations.white[piece] = whiteLoc[piece].map((tile) => {
       const moveData = moveMap[piece].findTiles(
@@ -59,6 +60,12 @@ export const legalMoves = (board) => {
         Object.values(blackLoc).flat(),
         "white"
       );
+      whiteAttacks.push(moveData.attacks);
+
+      if (moveData.attacks.length === 1 && moveData.attacks[0] === undefined) {
+        moveData.attacks.pop();
+      }
+
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
@@ -75,6 +82,9 @@ export const legalMoves = (board) => {
         Object.values(whiteLoc).flat(),
         "black"
       );
+
+      blackAttacks.push(moveData?.attacks);
+      blackAttacks.flat();
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
@@ -83,6 +93,25 @@ export const legalMoves = (board) => {
     });
   });
 
+  // will reach here after a move has been made. (all next moves are calculated.)
+
+  console.log(whiteAttacks.flat());
+  const checksOnWhite = moveMap.king.checkForChecks(
+    [
+      pieceLocations.white.king[0].legalAttacks,
+      pieceLocations.white.king[0].legalMoves,
+    ].flat(),
+    pieceLocations.white.currentlyAt,
+    blackAttacks
+  );
+  const checksOnBlack = moveMap.king.checkForChecks(
+    [
+      pieceLocations.black.king[0].legalAttacks,
+      pieceLocations.black.king[0].legalMoves,
+    ].flat(),
+    pieceLocations.black.currentlyAt,
+    blackAttacks
+  );
   return pieceLocations;
 };
 
@@ -98,6 +127,15 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
       return {
         ...tile,
         pieceOnTile: {},
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else if (
+      tileToMoveTo === tile &&
+      tileToMoveTo.styleClass === "takeable"
+    ) {
+      return {
+        ...tile,
+        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
         styleClass: findStyleClass(tile.x, tile.y),
       };
     } else {
