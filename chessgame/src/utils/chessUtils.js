@@ -60,11 +60,8 @@ export const legalMoves = (board) => {
         Object.values(blackLoc).flat(),
         "white"
       );
-      whiteAttacks.push(moveData.attacks);
 
-      if (moveData.attacks.length === 1 && moveData.attacks[0] === undefined) {
-        moveData.attacks.pop();
-      }
+      if (moveData.attacks.length) whiteAttacks.push(moveData.attacks);
 
       return {
         currentlyAt: tile,
@@ -83,8 +80,7 @@ export const legalMoves = (board) => {
         "black"
       );
 
-      blackAttacks.push(moveData?.attacks);
-      blackAttacks.flat();
+      if (moveData.attacks.length) blackAttacks.push(moveData.attacks);
       return {
         currentlyAt: tile,
         legalMoves: moveData.moves,
@@ -95,14 +91,13 @@ export const legalMoves = (board) => {
 
   // will reach here after a move has been made. (all next moves are calculated.)
 
-  console.log(whiteAttacks.flat());
   const checksOnWhite = moveMap.king.checkForChecks(
     [
       pieceLocations.white.king[0].legalAttacks,
       pieceLocations.white.king[0].legalMoves,
     ].flat(),
     pieceLocations.white.currentlyAt,
-    blackAttacks
+    blackAttacks.flat()
   );
   const checksOnBlack = moveMap.king.checkForChecks(
     [
@@ -110,7 +105,7 @@ export const legalMoves = (board) => {
       pieceLocations.black.king[0].legalMoves,
     ].flat(),
     pieceLocations.black.currentlyAt,
-    blackAttacks
+    whiteAttacks.flat()
   );
   return pieceLocations;
 };

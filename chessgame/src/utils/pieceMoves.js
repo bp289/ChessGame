@@ -345,6 +345,8 @@ function getStraight(
     );
   }
 
+  // console.log([up.attackTile, down.attackTile, left.attackTile, right.attack]);
+
   return {
     moves: [
       up.legalMoves,
@@ -353,10 +355,10 @@ function getStraight(
       right.legalMoves,
     ].flat(),
     attacks: [
-      up?.attackTile,
-      down?.attackTile,
-      left?.attackTile,
-      right?.attack,
+      up.attackTile,
+      down.attackTile,
+      left.attackTile,
+      right.attackTile,
     ].flat(),
   };
 }
