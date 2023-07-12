@@ -101,7 +101,8 @@ export const legalMoves = (board) => {
     ].flat(),
     pieceLocations.white.king[0].currentlyAt,
     blackAttacks.flat(),
-    blackMoves.flat()
+    blackMoves.flat(),
+    Object.values(blackLoc).flat()
   );
   const checksOnBlack = moveMap.king.checkForChecks(
     [
@@ -110,7 +111,8 @@ export const legalMoves = (board) => {
     ].flat(),
     pieceLocations.black.king[0].currentlyAt,
     whiteAttacks.flat(),
-    whiteMoves.flat()
+    whiteMoves.flat(),
+    Object.values(whiteLoc).flat()
   );
 
   console.log("black", checksOnBlack, "white", checksOnWhite);

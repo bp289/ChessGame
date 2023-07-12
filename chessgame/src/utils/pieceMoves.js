@@ -16,7 +16,7 @@ export const moveMap = {
       };
 
       if (color === "white") {
-        return currentTile.pieceOnTile.firstMove
+        return currentTile.pieceOnTile?.firstMove
           ? {
               moves: getMoves(
                 allyLocations,
@@ -65,7 +65,7 @@ export const moveMap = {
             !attackDirections[direction].blocked;
         }
 
-        return currentTile.pieceOnTile.firstMove
+        return currentTile.pieceOnTile?.firstMove
           ? {
               moves: getMoves(
                 allyLocations,
@@ -271,13 +271,15 @@ export const moveMap = {
       currentMoves,
       currentLocation,
       enemyAttacks,
-      enemyMoves
+      enemyMoves,
+      enemyLocations
     ) => {
       const { x, y } = currentLocation;
       let checkCount = 0;
       let isInCheck = false;
-      const movesThatCheck = [];
-
+      const potentialChecks = [];
+      const potentialAttacks = [];
+      console.log(currentLocation);
       enemyAttacks.forEach((enemyAttack) => {
         for (const attack of enemyAttack.attacks) {
           if (attack.x == x && attack.y == y) {
@@ -287,7 +289,27 @@ export const moveMap = {
         }
       });
 
-      return { isInCheck, movesThatCheck, checkCount };
+      enemyMoves.forEach((enemyMove) => {
+        const { piece, moves } = enemyMove;
+        const color = currentLocation.color === "black" ? "white" : "black";
+        const dangerousMoves = { piece, checkMoves: [] };
+        for (const move of moves) {
+          dangerousMoves.checkMoves.push(
+            moveMap[piece].findTiles(
+              move,
+              enemyLocations,
+              [currentLocation],
+              color
+            ).attacks
+          );
+        }
+
+        potentialAttacks.push(dangerousMoves);
+      });
+
+      console.log(potentialAttacks);
+
+      return { isInCheck, potentialChecks, checkCount };
     },
   },
 };
