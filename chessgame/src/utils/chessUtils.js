@@ -55,7 +55,7 @@ export const legalMoves = (board) => {
   const blackAttacks = [];
   const blackMoves = [];
 
-  formatLocations(
+  calculateMoves(
     whiteLoc,
     blackLoc,
     whiteAttacks,
@@ -63,7 +63,8 @@ export const legalMoves = (board) => {
     pieceLocations,
     "white"
   );
-  formatLocations(
+
+  calculateMoves(
     blackLoc,
     whiteLoc,
     blackAttacks,
@@ -102,7 +103,7 @@ export const legalMoves = (board) => {
   return pieceLocations;
 };
 
-const formatLocations = (
+const calculateMoves = (
   currentLocs,
   oppositeLocs,
   currentAttacks,
@@ -111,18 +112,28 @@ const formatLocations = (
   color
 ) => {
   Object.keys(currentLocs).forEach((piece) => {
-    pieceLocations[color][piece] = currentLocs[piece].map((tile) => {
+    pieceLocations[color][piece] = currentLocs[piece].map((currentTile) => {
       const moveData = moveMap[piece].findTiles(
-        tile,
+        currentTile,
         Object.values(currentLocs).flat(),
         Object.values(oppositeLocs).flat(),
         color
       );
 
-      currentAttacks.push({ piece, attacks: moveData.attacks });
-      currentMoves.push({ piece, moves: moveData.moves });
+      currentAttacks.push({
+        piece,
+        attacks: moveData.attacks,
+        currentTile,
+      });
+
+      currentMoves.push({
+        piece,
+        moves: moveData.moves,
+        attacks: moveData.attacks,
+        currentTile,
+      });
       return {
-        currentlyAt: tile,
+        currentlyAt: currentTile,
         legalMoves: moveData.moves,
         legalAttacks: moveData.attacks,
       };

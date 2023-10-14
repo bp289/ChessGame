@@ -204,52 +204,52 @@ export const moveMap = {
       enemyMoves,
       enemyLocations
     ) => {
-      let checkCount = 0;
       let isInCheck = false;
+      const piecesChecking = [];
+      const potentialChecks = [];
 
       const { x, y } = currentLocation;
-      const color =
+      const enemyColor =
         currentLocation.pieceOnTile.color === "black" ? "white" : "black";
 
-      const potentialChecks = [];
-      const potentialAttacks = [];
-
-      console.log("enemyattacks", enemyAttacks);
       enemyAttacks.forEach((enemyAttack) => {
         for (const attack of enemyAttack.attacks) {
           if (attack.x == x && attack.y == y) {
-            //checking if currently in check
             isInCheck = true;
-            checkCount++;
+            piecesChecking.push({
+              attack,
+              attackingFrom: enemyAttack.currentTile,
+              attackingPiece: enemyAttack.piece,
+            });
           }
         }
       });
 
       enemyMoves.forEach((enemyMove) => {
-        const { piece, moves } = enemyMove;
-
-        const dangerousMoves = { piece, checkMoves: [] };
-        for (const move of moves) {
-          const dangerMove = moveMap[piece].findTiles(
+        for (const move of enemyMove.moves) {
+          const moves = moveMap[enemyMove.piece].findTiles(
             move,
+            currentLocation,
             enemyLocations,
-            [currentLocation],
-            color
+            enemyColor
           );
-          // .attacks.filter((enemyAttack) => {
-          //   //if it attacks king;
-          //   console.log(enemyAttack);
-          // });
+
+          if (moves.attacks.length > 0) {
+            potentialChecks.push({
+              attack: moves.attacks,
+              fromTile: enemyMove.currentTile,
+              piece: enemyMove.piece,
+            });
+          }
         }
-        //potentialAttacks.push(dangerousMoves);
       });
 
-      // console.log(
-      //   `Potential Attacks against ${currentLocation.pieceOnTile.color}`,
-      //   potentialAttacks
-      // );
+      console.log(
+        `POTEMTIAL CHECKS ON ${currentLocation.pieceOnTile.color}`,
+        potentialChecks
+      );
 
-      return { isInCheck, potentialChecks, checkCount };
+      return { isInCheck, potentialChecks, piecesChecking };
     },
   },
 };
