@@ -204,14 +204,21 @@ export const moveMap = {
       enemyMoves,
       enemyLocations
     ) => {
-      const { x, y } = currentLocation;
       let checkCount = 0;
       let isInCheck = false;
+
+      const { x, y } = currentLocation;
+      const color =
+        currentLocation.pieceOnTile.color === "black" ? "white" : "black";
+
       const potentialChecks = [];
       const potentialAttacks = [];
+
+      console.log("enemyattacks", enemyAttacks);
       enemyAttacks.forEach((enemyAttack) => {
         for (const attack of enemyAttack.attacks) {
           if (attack.x == x && attack.y == y) {
+            //checking if currently in check
             isInCheck = true;
             checkCount++;
           }
@@ -220,27 +227,27 @@ export const moveMap = {
 
       enemyMoves.forEach((enemyMove) => {
         const { piece, moves } = enemyMove;
-        const color =
-          currentLocation.pieceOnTile.color === "black" ? "white" : "black";
+
         const dangerousMoves = { piece, checkMoves: [] };
         for (const move of moves) {
-          dangerousMoves.checkMoves.push(
-            moveMap[piece].findTiles(
-              move,
-              enemyLocations,
-              [currentLocation],
-              color
-            ).attacks
+          const dangerMove = moveMap[piece].findTiles(
+            move,
+            enemyLocations,
+            [currentLocation],
+            color
           );
+          // .attacks.filter((enemyAttack) => {
+          //   //if it attacks king;
+          //   console.log(enemyAttack);
+          // });
         }
-        console.log(dangerousMoves);
-        potentialAttacks.push(dangerousMoves);
+        //potentialAttacks.push(dangerousMoves);
       });
 
-      console.log(
-        `Potential Attacks against ${currentLocation.pieceOnTile.color}`,
-        potentialAttacks
-      );
+      // console.log(
+      //   `Potential Attacks against ${currentLocation.pieceOnTile.color}`,
+      //   potentialAttacks
+      // );
 
       return { isInCheck, potentialChecks, checkCount };
     },

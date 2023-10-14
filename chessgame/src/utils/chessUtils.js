@@ -54,45 +54,23 @@ export const legalMoves = (board) => {
   const whiteMoves = [];
   const blackAttacks = [];
   const blackMoves = [];
-  Object.keys(whiteLoc).forEach((piece) => {
-    pieceLocations.white[piece] = whiteLoc[piece].map((tile) => {
-      const moveData = moveMap[piece].findTiles(
-        tile,
-        Object.values(whiteLoc).flat(),
-        Object.values(blackLoc).flat(),
-        "white"
-      );
 
-      whiteAttacks.push({ piece, attacks: moveData.attacks });
-      whiteMoves.push({ piece, moves: moveData.moves });
-      return {
-        currentlyAt: tile,
-        legalMoves: moveData.moves,
-        legalAttacks: moveData.attacks,
-      };
-    });
-  });
-
-  Object.keys(blackLoc).forEach((piece) => {
-    pieceLocations.black[piece] = blackLoc[piece].map((tile) => {
-      const moveData = moveMap[piece].findTiles(
-        tile,
-        Object.values(blackLoc).flat(),
-        Object.values(whiteLoc).flat(),
-        "black"
-      );
-
-      blackAttacks.push({ piece, attacks: moveData.attacks });
-      blackMoves.push({ piece, moves: moveData.moves });
-      return {
-        currentlyAt: tile,
-        legalMoves: moveData.moves,
-        legalAttacks: moveData.attacks,
-      };
-    });
-  });
-
-  // will reach here after a move has been made. (all next moves are calculated.)
+  formatLocations(
+    whiteLoc,
+    blackLoc,
+    whiteAttacks,
+    whiteMoves,
+    pieceLocations,
+    "white"
+  );
+  formatLocations(
+    blackLoc,
+    whiteLoc,
+    blackAttacks,
+    blackMoves,
+    pieceLocations,
+    "black"
+  );
 
   const checksOnWhite = moveMap.king.checkForChecks(
     [
@@ -115,8 +93,41 @@ export const legalMoves = (board) => {
     Object.values(whiteLoc).flat()
   );
 
-  console.log("black", checksOnBlack, "white", checksOnWhite);
+  console.log(
+    "checks on black",
+    checksOnBlack,
+    "checks on white",
+    checksOnWhite
+  );
   return pieceLocations;
+};
+
+const formatLocations = (
+  currentLocs,
+  oppositeLocs,
+  currentAttacks,
+  currentMoves,
+  pieceLocations,
+  color
+) => {
+  Object.keys(currentLocs).forEach((piece) => {
+    pieceLocations[color][piece] = currentLocs[piece].map((tile) => {
+      const moveData = moveMap[piece].findTiles(
+        tile,
+        Object.values(currentLocs).flat(),
+        Object.values(oppositeLocs).flat(),
+        color
+      );
+
+      currentAttacks.push({ piece, attacks: moveData.attacks });
+      currentMoves.push({ piece, moves: moveData.moves });
+      return {
+        currentlyAt: tile,
+        legalMoves: moveData.moves,
+        legalAttacks: moveData.attacks,
+      };
+    });
+  });
 };
 
 export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
@@ -152,7 +163,7 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
 };
 
 const getPieceLocations = (board) => {
-  const pieceLocation = {
+  const result = {
     white: {
       pawn: [],
       knight: [],
@@ -173,8 +184,8 @@ const getPieceLocations = (board) => {
 
   board.forEach((tile) => {
     if (tile.pieceOnTile?.color === "white") {
-      if (pieceLocation.white[tile.pieceOnTile.name]) {
-        pieceLocation.white[tile.pieceOnTile.name].push({
+      if (result.white[tile.pieceOnTile.name]) {
+        result.white[tile.pieceOnTile.name].push({
           value: tile.value,
           x: tile.x,
           y: tile.y,
@@ -184,8 +195,8 @@ const getPieceLocations = (board) => {
     }
 
     if (tile.pieceOnTile?.color === "black") {
-      if (pieceLocation.black[tile.pieceOnTile.name]) {
-        pieceLocation.black[tile.pieceOnTile.name].push({
+      if (result.black[tile.pieceOnTile.name]) {
+        result.black[tile.pieceOnTile.name].push({
           value: tile.value,
           x: tile.x,
           y: tile.y,
@@ -195,5 +206,5 @@ const getPieceLocations = (board) => {
     }
   });
 
-  return pieceLocation;
+  return result;
 };
