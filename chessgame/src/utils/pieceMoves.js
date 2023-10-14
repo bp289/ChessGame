@@ -244,11 +244,6 @@ export const moveMap = {
         }
       });
 
-      console.log(
-        `POTEMTIAL CHECKS ON ${currentLocation.pieceOnTile.color}`,
-        potentialChecks
-      );
-
       return { isInCheck, potentialChecks, piecesChecking };
     },
   },
