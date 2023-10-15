@@ -45,3 +45,78 @@ export const startBoard = () => {
   }
   return board;
 };
+
+export const showMovesOnBoard = (moves, selectedTile, board) => {
+  const currentMoves = moves[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
+  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
+
+  const attackMoves = moves[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
+  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
+
+  return board.map((tile) => {
+    if (tile.value === selectedTile.value) {
+      return {
+        ...tile,
+        styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
+      };
+    } else {
+      for (let i = 0; i < currentMoves?.length; i++) {
+        if (currentMoves[i].x === tile.x && currentMoves[i].y === tile.y) {
+          return {
+            ...tile,
+            styleClass: "movable",
+          };
+        }
+      }
+      for (let i = 0; i < attackMoves.length; i++) {
+        if (attackMoves[i]?.x === tile.x && attackMoves[i]?.y === tile.y) {
+          return {
+            ...tile,
+            styleClass: "takeable",
+          };
+        }
+      }
+      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+    }
+  });
+};
+
+export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
+  return board.map((tile) => {
+    if (tileToMoveTo === tile && tileToMoveTo.styleClass === "movable") {
+      return {
+        ...tile,
+        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else if (tile.value === tileToMoveFrom.value) {
+      return {
+        ...tile,
+        pieceOnTile: {},
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else if (
+      tileToMoveTo === tile &&
+      tileToMoveTo.styleClass === "takeable"
+    ) {
+      return {
+        ...tile,
+        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    } else {
+      return {
+        ...tile,
+        styleClass: findStyleClass(tile.x, tile.y),
+      };
+    }
+  });
+};
+
+export const unSelect = (board) => {
+  return board.map((tile) => {
+    return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
+  });
+};

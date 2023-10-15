@@ -1,49 +1,6 @@
 import { findStyleClass } from "./chessBoardUtils";
 import { moveMap } from "./pieceMoves";
 
-export const showLegalMoves = (moves, selectedTile, board) => {
-  const currentMoves = moves[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
-
-  const attackMoves = moves[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
-
-  return board.map((tile) => {
-    if (tile.value === selectedTile.value) {
-      return {
-        ...tile,
-        styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
-      };
-    } else {
-      for (let i = 0; i < currentMoves?.length; i++) {
-        if (currentMoves[i].x === tile.x && currentMoves[i].y === tile.y) {
-          return {
-            ...tile,
-            styleClass: "movable",
-          };
-        }
-      }
-      for (let i = 0; i < attackMoves.length; i++) {
-        if (attackMoves[i]?.x === tile.x && attackMoves[i]?.y === tile.y) {
-          return {
-            ...tile,
-            styleClass: "takeable",
-          };
-        }
-      }
-      return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
-    }
-  });
-};
-
-export const unSelect = (board) => {
-  return board.map((tile) => {
-    return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
-  });
-};
-
 export const legalMoves = (board) => {
   let pieceLocations = getPieceLocations(board);
 
