@@ -51,13 +51,20 @@ export const legalMoves = (board) => {
     Object.values(whiteLoc).flat()
   );
 
+  pieceLocations.black.king[0].checkData = checksOnBlack;
+  pieceLocations.white.king[0].checkData = checksOnWhite;
+
   console.log(
     "checks on black",
     checksOnBlack,
     "checks on white",
     checksOnWhite
   );
-  return pieceLocations;
+
+  return {
+    pieceLocations: pieceLocations,
+    checks: { black: checksOnBlack, white: checksOnWhite },
+  };
 };
 
 const calculateMoves = (
@@ -89,44 +96,13 @@ const calculateMoves = (
         attacks: moveData.attacks,
         currentTile,
       });
+
       return {
         currentlyAt: currentTile,
         legalMoves: moveData.moves,
         legalAttacks: moveData.attacks,
       };
     });
-  });
-};
-
-export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
-  return board.map((tile) => {
-    if (tileToMoveTo === tile && tileToMoveTo.styleClass === "movable") {
-      return {
-        ...tile,
-        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    } else if (tile.value === tileToMoveFrom.value) {
-      return {
-        ...tile,
-        pieceOnTile: {},
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    } else if (
-      tileToMoveTo === tile &&
-      tileToMoveTo.styleClass === "takeable"
-    ) {
-      return {
-        ...tile,
-        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    } else {
-      return {
-        ...tile,
-        styleClass: findStyleClass(tile.x, tile.y),
-      };
-    }
   });
 };
 

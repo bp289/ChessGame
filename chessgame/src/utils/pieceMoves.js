@@ -222,28 +222,18 @@ export const moveMap = {
               attackingPiece: enemyAttack.piece,
             });
           }
+          //all places that enemy can attack
+          potentialChecks.push(attack);
         }
       });
-
+      // all places that enemy can see
       enemyMoves.forEach((enemyMove) => {
         for (const move of enemyMove.moves) {
-          const moves = moveMap[enemyMove.piece].findTiles(
-            move,
-            currentLocation,
-            enemyLocations,
-            enemyColor
-          );
-
-          if (moves.attacks.length > 0) {
-            potentialChecks.push({
-              attack: moves.attacks,
-              fromTile: enemyMove.currentTile,
-              piece: enemyMove.piece,
-            });
-          }
+          potentialChecks.push(move);
         }
       });
-
+      // all places that king can attack that enemy can see
+      console.log(currentLocation.pieceOnTile.color, currentMoves);
       return { isInCheck, potentialChecks, piecesChecking };
     },
   },

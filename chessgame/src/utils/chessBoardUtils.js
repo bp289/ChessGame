@@ -46,14 +46,17 @@ export const startBoard = () => {
   return board;
 };
 
-export const showMovesOnBoard = (moves, selectedTile, board) => {
-  const currentMoves = moves[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0].legalMoves;
+export const showMovesOnBoard = (
+  { pieceLocations, checks },
+  selectedTile,
+  board
+) => {
+  const potentialChecks =
+    checks[selectedTile.pieceOnTile.color].potentialChecks;
+  const isInCheck = checks[selectedTile.pieceOnTile.color].isInCheck;
 
-  const attackMoves = moves[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
+  const normalMoves = getMoves(pieceLocations, selectedTile, potentialChecks);
+  const attackMoves = getAttacks(pieceLocations, selectedTile);
 
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
@@ -62,8 +65,8 @@ export const showMovesOnBoard = (moves, selectedTile, board) => {
         styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
       };
     } else {
-      for (let i = 0; i < currentMoves?.length; i++) {
-        if (currentMoves[i].x === tile.x && currentMoves[i].y === tile.y) {
+      for (let i = 0; i < normalMoves?.length; i++) {
+        if (normalMoves[i].x === tile.x && normalMoves[i].y === tile.y) {
           return {
             ...tile,
             styleClass: "movable",
@@ -119,4 +122,18 @@ export const unSelect = (board) => {
   return board.map((tile) => {
     return { ...tile, styleClass: findStyleClass(tile.x, tile.y) };
   });
+};
+
+const getMoves = (pieceLocations, selectedTile, potentialChecks) => {
+  const result = pieceLocations[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
+  ].find((e) => e.currentlyAt.value === selectedTile.value).legalMoves;
+
+  return result;
+};
+
+const getAttacks = (pieceLocations, selectedTile) => {
+  return pieceLocations[selectedTile.pieceOnTile?.color][
+    selectedTile?.pieceOnTile.name
+  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
 };
