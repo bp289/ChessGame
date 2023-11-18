@@ -165,7 +165,6 @@ export const moveMap = {
       };
     },
     checkForChecks: (
-      currentMoves,
       currentLocation,
       enemyAttacks,
       enemyProtections,
@@ -221,7 +220,6 @@ function getMoves(
   color,
   diagonals
 ) {
-  console.log(currentTile, directions);
   const { up, down, left, right } = directions;
   for (let i = 1; i <= limit; i++) {
     const currentDir = diagonals
