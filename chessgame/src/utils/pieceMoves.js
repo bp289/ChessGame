@@ -1,56 +1,22 @@
+import { createDirections, createPawnDirections } from "./directionConstants";
 export const moveMap = {
   pawn: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const directions = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          blocked: color !== "white",
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          blocked: color === "white",
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          blocked: true,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          blocked: true,
-        },
-      };
-
-      const attackDirections = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          blocked: color !== "white",
-        }, //upRight
-        down: {
-          legalMoves: [],
-          attackTile: [],
-
-          blocked: color !== "white",
-        }, //upLeft
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: color === "white",
-        }, //downRight
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: color === "white",
-        }, //downLeft
-      };
+      const { normal, attack } = createPawnDirections(color);
+      const directions = normal;
+      const attackDirections = attack;
 
       const firstMove = currentTile.pieceOnTile?.firstMove ? 2 : 1;
+
+      const { attacks, protections } = getMoves(
+        allyLocations,
+        enemyLocations,
+        attackDirections,
+        currentTile,
+        firstMove,
+        color,
+        true
+      );
 
       return {
         moves: getMoves(
@@ -62,15 +28,8 @@ export const moveMap = {
           color,
           false
         ).moves,
-        attacks: getMoves(
-          [],
-          enemyLocations,
-          attackDirections,
-          currentTile,
-          firstMove,
-          color,
-          true
-        ).attacks,
+        attacks,
+        protections,
       };
     },
   },
@@ -114,32 +73,7 @@ export const moveMap = {
   },
   bishop: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const directions = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
+      const directions = createDirections("diagonal");
 
       return getMoves(
         allyLocations,
@@ -154,32 +88,7 @@ export const moveMap = {
   },
   rook: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const directions = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
+      const directions = createDirections("straight");
 
       return getMoves(
         allyLocations,
@@ -194,58 +103,8 @@ export const moveMap = {
   },
   queen: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const straightDirections = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
-      const diagonalDirections = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
+      const { straightDirections, diagonalDirections } =
+        createDirections("both");
 
       const diagonals = getMoves(
         allyLocations,
@@ -276,58 +135,8 @@ export const moveMap = {
   },
   king: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const straightDirections = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
-      const diagonalDirections = {
-        up: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        down: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        left: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-        right: {
-          legalMoves: [],
-          attackTile: [],
-          protectingTile: [],
-          blocked: false,
-        },
-      };
+      const { straightDirections, diagonalDirections } =
+        createDirections("both");
 
       const diagonals = getMoves(
         allyLocations,
@@ -359,8 +168,8 @@ export const moveMap = {
       currentMoves,
       currentLocation,
       enemyAttacks,
-      enemyMoves,
-      enemyLocations
+      enemyProtections,
+      enemyMoves
     ) => {
       let isInCheck = false;
       const piecesChecking = [];
@@ -380,18 +189,24 @@ export const moveMap = {
               attackingPiece: enemyAttack.piece,
             });
           }
-          //all places that enemy can attack
+          //all places that enemy is attacking an ally piece, which king cant move to
           potentialChecks.push(attack);
         }
       });
-      // all places that enemy can see
+      // all places that enemy can see, where king cant move to
       enemyMoves.forEach((enemyMove) => {
         for (const move of enemyMove.moves) {
           potentialChecks.push(move);
         }
       });
-      // all places that king can attack that enemy can see
-      console.log(currentLocation.pieceOnTile.color, currentMoves);
+
+      //all pieces that enemy is protecting, which king cant move to
+      enemyProtections.forEach((enemyProtection) => {
+        for (const move of enemyProtection?.protections) {
+          potentialChecks.push(move);
+        }
+      });
+
       return { isInCheck, potentialChecks, piecesChecking };
     },
   },
@@ -406,6 +221,7 @@ function getMoves(
   color,
   diagonals
 ) {
+  console.log(currentTile, directions);
   const { up, down, left, right } = directions;
   for (let i = 1; i <= limit; i++) {
     const currentDir = diagonals
@@ -486,7 +302,7 @@ function calculateAttacksAndMoves(
   currentDir,
   color
 ) {
-  const { up, down, left, right } = directions;
+  const { up, down, left, right } = { ...directions };
 
   const directionMappings = [
     { direction: up, currentDirection: currentDir.up },
@@ -509,7 +325,7 @@ function calculateAttacksAndMoves(
           if (location.pieceOnTile.color !== color) {
             direction.attackTile.push(currentDirection);
           } else if (location.pieceOnTile.color === color) {
-            direction.protectingTile.push(currentDirection);
+            direction?.protectingTile.push(currentDirection);
           }
         }
       });

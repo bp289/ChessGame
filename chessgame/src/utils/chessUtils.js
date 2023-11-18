@@ -41,6 +41,7 @@ export const legalMoves = (board) => {
     ].flat(),
     pieceLocations.white.king[0].currentlyAt,
     blackAttacks.flat(),
+    blackProtections.flat(),
     blackMoves.flat(),
     Object.values(blackLoc).flat()
   );
@@ -51,12 +52,10 @@ export const legalMoves = (board) => {
     ].flat(),
     pieceLocations.black.king[0].currentlyAt,
     whiteAttacks.flat(),
+    blackProtections.flat(),
     whiteMoves.flat(),
     Object.values(whiteLoc).flat()
   );
-
-  console.log(whiteProtections, blackProtections);
-  console.log(blackAttacks, whiteAttacks);
 
   pieceLocations.black.king[0].checkData = checksOnBlack;
   pieceLocations.white.king[0].checkData = checksOnWhite;
