@@ -54,7 +54,6 @@ export const showMovesOnBoard = (
   const potentialChecks =
     checks[selectedTile.pieceOnTile.color].potentialChecks;
   const isInCheck = checks[selectedTile.pieceOnTile.color].isInCheck;
-  console.log(potentialChecks);
   const normalMoves = getMoves(pieceLocations, selectedTile, potentialChecks);
   const attackMoves = getAttacks(pieceLocations, selectedTile);
 

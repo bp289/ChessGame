@@ -42,10 +42,6 @@ export const legalMoves = (board) => {
     Object.values(blackLoc).flat()
   );
   const checksOnBlack = moveMap.king.checkForChecks(
-    [
-      pieceLocations.black.king[0].legalAttacks,
-      pieceLocations.black.king[0].legalMoves,
-    ].flat(),
     pieceLocations.black.king[0].currentlyAt,
     whiteAttacks.flat(),
     blackProtections.flat(),
@@ -53,18 +49,19 @@ export const legalMoves = (board) => {
     Object.values(whiteLoc).flat()
   );
 
+  console.log(checksOnBlack);
+  console.log(checksOnWhite);
   //removes checking moves for black
   pieceLocations.black.king[0].legalMoves.filter((move) => {
-    for (checkingMove of checksOnBlack.potentialChecks) {
-      if (checkingMove.x !== move.x && checkingMove.y !== move.y) {
-        return move;
-      }
+    console.log(move);
+    for (const checkingMove of checksOnBlack.potentialChecks) {
+      console.log(checkingMove);
     }
   });
 
   //removes checking moves for white
   pieceLocations.white.king[0].legalMoves.filter((move) => {
-    for (checkingMove of checksOnWhite.potentialChecks) {
+    for (const checkingMove of checksOnWhite.potentialChecks) {
       if (checkingMove.x !== move.x && checkingMove.y !== move.y) {
         return move;
       }

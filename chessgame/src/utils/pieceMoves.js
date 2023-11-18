@@ -264,12 +264,16 @@ function getMoves(
           },
         };
 
-    calculateAttacksAndMoves(
-      [allyLocations, enemyLocations].flat(),
-      directions,
-      currentDir,
-      color
-    );
+    try {
+      calculateAttacksAndMoves(
+        [allyLocations, enemyLocations].flat(),
+        directions,
+        currentDir,
+        color
+      );
+    } catch (e) {
+      console.error(e, currentTile, directions);
+    }
   }
 
   return {
@@ -323,7 +327,9 @@ function calculateAttacksAndMoves(
           if (location.pieceOnTile.color !== color) {
             direction.attackTile.push(currentDirection);
           } else if (location.pieceOnTile.color === color) {
-            direction?.protectingTile.push(currentDirection);
+            if (direction.protectingTile) {
+              direction?.protectingTile.push(currentDirection);
+            }
           }
         }
       });
