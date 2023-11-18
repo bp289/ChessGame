@@ -88,7 +88,7 @@ export const moveMap = {
       ];
 
       const attacks = [];
-      const protecting = [];
+      const protections = [];
       const loc = [allyLocations, enemyLocations].flat();
 
       [...tiles].forEach((validTile) => {
@@ -97,7 +97,7 @@ export const moveMap = {
             if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
               if (loc[i].pieceOnTile.color == color) {
                 tiles.splice(tiles.indexOf(validTile), 1);
-                protecting.push(validTile);
+                protections.push(validTile);
               } else {
                 tiles.splice(tiles.indexOf(validTile), 1);
                 attacks.push(validTile);
@@ -109,7 +109,7 @@ export const moveMap = {
         }
       });
 
-      return { moves: tiles, attacks: attacks, protecting: protecting };
+      return { moves: tiles, attacks: attacks, protections: protections };
     },
   },
   bishop: {
@@ -270,6 +270,7 @@ export const moveMap = {
       return {
         moves: [diagonals.moves, straights.moves].flat(),
         attacks: [diagonals.attacks, straights.attacks].flat(),
+        protections: [diagonals.protections, straights.protections].flat(),
       };
     },
   },
@@ -351,6 +352,7 @@ export const moveMap = {
       return {
         moves: [diagonals.moves, straights.moves].flat(),
         attacks: [diagonals.attacks, straights.attacks].flat(),
+        protections: [diagonals.protections, straights.protections].flat(),
       };
     },
     checkForChecks: (
@@ -468,6 +470,12 @@ function getMoves(
       down.attackTile,
       left.attackTile,
       right.attackTile,
+    ].flat(),
+    protections: [
+      up.protectingTile,
+      down.protectingTile,
+      left.protectingTile,
+      right.protectingTile,
     ].flat(),
   };
 }

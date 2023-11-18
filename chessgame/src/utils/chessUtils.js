@@ -9,13 +9,16 @@ export const legalMoves = (board) => {
 
   const whiteAttacks = [];
   const whiteMoves = [];
+  const whiteProtections = [];
   const blackAttacks = [];
+  const blackProtections = [];
   const blackMoves = [];
 
   calculateMoves(
     whiteLoc,
     blackLoc,
     whiteAttacks,
+    whiteProtections,
     whiteMoves,
     pieceLocations,
     "white"
@@ -25,6 +28,7 @@ export const legalMoves = (board) => {
     blackLoc,
     whiteLoc,
     blackAttacks,
+    blackProtections,
     blackMoves,
     pieceLocations,
     "black"
@@ -51,6 +55,9 @@ export const legalMoves = (board) => {
     Object.values(whiteLoc).flat()
   );
 
+  console.log(whiteProtections, blackProtections);
+  console.log(blackAttacks, whiteAttacks);
+
   pieceLocations.black.king[0].checkData = checksOnBlack;
   pieceLocations.white.king[0].checkData = checksOnWhite;
 
@@ -71,6 +78,7 @@ const calculateMoves = (
   currentLocs,
   oppositeLocs,
   currentAttacks,
+  currentProtections,
   currentMoves,
   pieceLocations,
   color
@@ -94,6 +102,12 @@ const calculateMoves = (
         piece,
         moves: moveData.moves,
         attacks: moveData.attacks,
+        currentTile,
+      });
+
+      currentProtections.push({
+        piece,
+        protections: moveData.protections,
         currentTile,
       });
 
