@@ -1,4 +1,3 @@
-import { findStyleClass } from "./chessBoardUtils";
 import { moveMap } from "./pieceMoves";
 
 export const legalMoves = (board) => {
@@ -34,39 +33,27 @@ export const legalMoves = (board) => {
     "black"
   );
 
-  const checksOnWhite = moveMap.king.checkForChecks(
+  const checksOnWhite = checkForChecks(
     pieceLocations.white.king[0].currentlyAt,
-    blackAttacks.flat(),
-    blackProtections.flat(),
-    blackMoves.flat(),
-    Object.values(blackLoc).flat()
+    blackAttacks,
+    blackProtections,
+    blackMoves,
+    pieceLocations.white.king[0].legalMoves,
+    pieceLocations.white.king[0].legalAttacks
   );
-  const checksOnBlack = moveMap.king.checkForChecks(
+
+  pieceLocations.white.king[0] = checksOnWhite.filteredKing;
+
+  const checksOnBlack = checkForChecks(
     pieceLocations.black.king[0].currentlyAt,
-    whiteAttacks.flat(),
-    blackProtections.flat(),
-    whiteMoves.flat(),
-    Object.values(whiteLoc).flat()
+    whiteAttacks,
+    whiteProtections,
+    whiteMoves,
+    pieceLocations.black.king[0].legalMoves,
+    pieceLocations.black.king[0].legalAttacks
   );
 
-  console.log(checksOnBlack);
-  console.log(checksOnWhite);
-  //removes checking moves for black
-  pieceLocations.black.king[0].legalMoves.filter((move) => {
-    console.log(move);
-    for (const checkingMove of checksOnBlack.potentialChecks) {
-      console.log(checkingMove);
-    }
-  });
-
-  //removes checking moves for white
-  pieceLocations.white.king[0].legalMoves.filter((move) => {
-    for (const checkingMove of checksOnWhite.potentialChecks) {
-      if (checkingMove.x !== move.x && checkingMove.y !== move.y) {
-        return move;
-      }
-    }
-  });
+  pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
   return {
     pieceLocations: pieceLocations,
@@ -93,20 +80,16 @@ const calculateMoves = (
       );
 
       currentAttacks.push({
-        piece,
         attacks: moveData.attacks,
         currentTile,
       });
 
       currentMoves.push({
-        piece,
         moves: moveData.moves,
-        attacks: moveData.attacks,
         currentTile,
       });
 
       currentProtections.push({
-        piece,
         protections: moveData.protections,
         currentTile,
       });
@@ -165,4 +148,76 @@ const getPieceLocations = (board) => {
   });
 
   return result;
+};
+
+const checkForChecks = (
+  currentLocation,
+  enemyAttacks,
+  enemyProtections,
+  enemyMoves,
+  kingsMoves,
+  kingsAttacks
+) => {
+  let filteredKingMoves = [...kingsMoves];
+  let filteredKingAttacks = [...kingsAttacks];
+  let isInCheck = false;
+  const piecesChecking = [];
+
+  const { x, y } = currentLocation;
+
+  enemyAttacks.forEach((enemyAttack) => {
+    for (const attack of enemyAttack.attacks) {
+      if (attack.x === x && attack.y === y) {
+        isInCheck = true;
+        piecesChecking.push({
+          attack,
+          attackingFrom: enemyAttack.currentTile,
+          attackingPiece: enemyAttack.piece,
+        });
+      }
+      //all places that enemy is attacking an ally piece, which king cant move to
+      filteredKingAttacks = kingsAttacks.filter(
+        (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
+      );
+
+      filteredKingMoves = kingsMoves.filter(
+        (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
+      );
+    }
+  });
+
+  //all places that enemy can see, where king cant move to
+  enemyMoves.forEach((enemyMove) => {
+    for (const move of enemyMove.moves) {
+      filteredKingAttacks = filteredKingAttacks.filter(
+        (kingAttack) => kingAttack.x !== move.x || kingAttack.y !== move.y
+      );
+
+      filteredKingMoves = filteredKingMoves.filter(
+        (kingMove) => kingMove.x !== move.x || kingMove.y !== move.y
+      );
+    }
+  });
+
+  //all pieces that enemy is protecting, which king cant move to
+  enemyProtections.forEach((enemyProtection) => {
+    for (const move of enemyProtection?.protections) {
+      filteredKingAttacks = filteredKingAttacks.filter(
+        (kingAttack) => kingAttack.x !== move.x || kingAttack.y !== move.y
+      );
+      filteredKingMoves = filteredKingMoves.filter(
+        (kingMove) => kingMove.x !== move.x || kingMove.y !== move.y
+      );
+    }
+  });
+
+  return {
+    isInCheck,
+    piecesChecking,
+    filteredKing: {
+      currentlyAt: currentLocation,
+      legalMoves: filteredKingMoves,
+      legalAttacks: filteredKingAttacks,
+    },
+  };
 };

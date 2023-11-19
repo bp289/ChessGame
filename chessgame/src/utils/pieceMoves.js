@@ -54,7 +54,7 @@ export const moveMap = {
         if (isValidCoordinate(validTile.x, validTile.y)) {
           for (let i = 0; i < loc.length; i++) {
             if (loc[i].x === validTile.x && loc[i].y === validTile.y) {
-              if (loc[i].pieceOnTile.color == color) {
+              if (loc[i].pieceOnTile.color === color) {
                 tiles.splice(tiles.indexOf(validTile), 1);
                 protections.push(validTile);
               } else {
@@ -163,50 +163,6 @@ export const moveMap = {
         attacks: [diagonals.attacks, straights.attacks].flat(),
         protections: [diagonals.protections, straights.protections].flat(),
       };
-    },
-    checkForChecks: (
-      currentLocation,
-      enemyAttacks,
-      enemyProtections,
-      enemyMoves
-    ) => {
-      let isInCheck = false;
-      const piecesChecking = [];
-      const potentialChecks = [];
-
-      const { x, y } = currentLocation;
-      const enemyColor =
-        currentLocation.pieceOnTile.color === "black" ? "white" : "black";
-
-      enemyAttacks.forEach((enemyAttack) => {
-        for (const attack of enemyAttack.attacks) {
-          if (attack.x == x && attack.y == y) {
-            isInCheck = true;
-            piecesChecking.push({
-              attack,
-              attackingFrom: enemyAttack.currentTile,
-              attackingPiece: enemyAttack.piece,
-            });
-          }
-          //all places that enemy is attacking an ally piece, which king cant move to
-          potentialChecks.push(attack);
-        }
-      });
-      // all places that enemy can see, where king cant move to
-      enemyMoves.forEach((enemyMove) => {
-        for (const move of enemyMove.moves) {
-          potentialChecks.push(move);
-        }
-      });
-
-      //all pieces that enemy is protecting, which king cant move to
-      enemyProtections.forEach((enemyProtection) => {
-        for (const move of enemyProtection?.protections) {
-          potentialChecks.push(move);
-        }
-      });
-
-      return { isInCheck, potentialChecks, piecesChecking };
     },
   },
 };
