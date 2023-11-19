@@ -79,10 +79,7 @@ const calculateMoves = (
         color
       );
 
-      currentAttacks.push({
-        attacks: moveData.attacks,
-        currentTile,
-      });
+      currentAttacks.push(checkPawnAttacks(moveData, currentTile));
 
       currentMoves.push({
         moves: moveData.moves,
@@ -166,6 +163,8 @@ const checkForChecks = (
   const { x, y } = currentLocation;
 
   enemyAttacks.forEach((enemyAttack) => {
+    if (enemyAttack.potentialAttacks)
+      console.log(enemyAttack.potentialAttacks, enemyAttack.currentTile.value);
     for (const attack of enemyAttack.attacks) {
       if (attack.x === x && attack.y === y) {
         isInCheck = true;
@@ -175,27 +174,44 @@ const checkForChecks = (
           attackingPiece: enemyAttack.piece,
         });
       }
+
       //all places that enemy is attacking an ally piece, which king cant move to
-      filteredKingAttacks = kingsAttacks.filter(
+      filteredKingAttacks = filteredKingAttacks.filter(
         (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
       );
 
-      filteredKingMoves = kingsMoves.filter(
+      filteredKingMoves = filteredKingMoves.filter(
         (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
       );
+    }
+
+    //Potential attacks from pawns.
+    if (enemyAttack.potentialAttacks) {
+      for (const attack of enemyAttack.potentialAttacks) {
+        //all places that enemy is attacking an ally piece, which king cant move to
+        filteredKingAttacks = filteredKingAttacks.filter(
+          (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
+        );
+
+        filteredKingMoves = filteredKingMoves.filter(
+          (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
+        );
+      }
     }
   });
 
   //all places that enemy can see, where king cant move to
   enemyMoves.forEach((enemyMove) => {
-    for (const move of enemyMove.moves) {
-      filteredKingAttacks = filteredKingAttacks.filter(
-        (kingAttack) => kingAttack.x !== move.x || kingAttack.y !== move.y
-      );
+    if (enemyMove.currentTile.pieceOnTile !== "pawn") {
+      for (const move of enemyMove.moves) {
+        filteredKingAttacks = filteredKingAttacks.filter(
+          (kingAttack) => kingAttack.x !== move.x || kingAttack.y !== move.y
+        );
 
-      filteredKingMoves = filteredKingMoves.filter(
-        (kingMove) => kingMove.x !== move.x || kingMove.y !== move.y
-      );
+        filteredKingMoves = filteredKingMoves.filter(
+          (kingMove) => kingMove.x !== move.x || kingMove.y !== move.y
+        );
+      }
     }
   });
 
@@ -219,5 +235,19 @@ const checkForChecks = (
       legalMoves: filteredKingMoves,
       legalAttacks: filteredKingAttacks,
     },
+  };
+};
+
+const checkPawnAttacks = (moveData, currentTile) => {
+  if (currentTile.pieceOnTile.name === "pawn") {
+    return {
+      attacks: moveData.attacks,
+      potentialAttacks: moveData.potentialAttacks,
+      currentTile,
+    };
+  }
+  return {
+    attacks: moveData.attacks,
+    currentTile,
   };
 };

@@ -124,29 +124,33 @@ export const createPawnDirections = (color) => {
       right: { legalMoves: [], attackTile: [], blocked: true },
     },
     attack: {
+      //actually up right
       up: {
         legalMoves: [],
         protectingTile: [],
         attackTile: [],
         blocked: color === "black",
       },
+      //actually up left
       down: {
         legalMoves: [],
         attackTile: [],
         protectingTile: [],
-        blocked: color === "white",
+        blocked: color === "black",
       },
+      //actually down right
       left: {
         legalMoves: [],
         protectingTile: [],
         attackTile: [],
-        blocked: true,
+        blocked: color === "white",
       },
+      //actually down left
       right: {
         legalMoves: [],
         protectingTile: [],
         attackTile: [],
-        blocked: true,
+        blocked: color === "white",
       },
     },
   };

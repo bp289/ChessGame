@@ -8,16 +8,15 @@ export const moveMap = {
 
       const firstMove = currentTile.pieceOnTile?.firstMove ? 2 : 1;
 
-      const { attacks, protections } = getMoves(
+      const { moves, attacks, protections } = getMoves(
         allyLocations,
         enemyLocations,
         attackDirections,
         currentTile,
-        firstMove,
+        1,
         color,
         true
       );
-
       return {
         moves: getMoves(
           allyLocations,
@@ -30,6 +29,7 @@ export const moveMap = {
         ).moves,
         attacks,
         protections,
+        potentialAttacks: moves,
       };
     },
   },
