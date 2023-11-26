@@ -51,10 +51,7 @@ export const showMovesOnBoard = (
   selectedTile,
   board
 ) => {
-  const potentialChecks =
-    checks[selectedTile.pieceOnTile.color].potentialChecks;
-  const isInCheck = checks[selectedTile.pieceOnTile.color].isInCheck;
-  const normalMoves = getMoves(pieceLocations, selectedTile, potentialChecks);
+  const normalMoves = getMoves(pieceLocations, selectedTile);
   const attackMoves = getAttacks(pieceLocations, selectedTile);
 
   return board.map((tile) => {
@@ -123,7 +120,7 @@ export const unSelect = (board) => {
   });
 };
 
-const getMoves = (pieceLocations, selectedTile, potentialChecks) => {
+const getMoves = (pieceLocations, selectedTile) => {
   const result = pieceLocations[selectedTile.pieceOnTile?.color][
     selectedTile?.pieceOnTile.name
   ].find((e) => e.currentlyAt.value === selectedTile.value).legalMoves;

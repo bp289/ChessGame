@@ -13,10 +13,16 @@ export const legalMoves = (board) => {
   const blackProtections = [];
   const blackMoves = [];
 
+  // (potentially)pinning attacks
+
+  const pinningAttacksWhite = { queens: [], rooks: [], bishops: [] };
+  const pinningAttacksBlack = { queens: [], rooks: [], bishops: [] };
+
   calculateMoves(
     whiteLoc,
     blackLoc,
     whiteAttacks,
+    pinningAttacksWhite,
     whiteProtections,
     whiteMoves,
     pieceLocations,
@@ -27,12 +33,14 @@ export const legalMoves = (board) => {
     blackLoc,
     whiteLoc,
     blackAttacks,
+    pinningAttacksBlack,
     blackProtections,
     blackMoves,
     pieceLocations,
     "black"
   );
 
+  //calculate Checks
   const checksOnWhite = checkForChecks(
     pieceLocations.white.king[0].currentlyAt,
     blackAttacks,
@@ -55,9 +63,20 @@ export const legalMoves = (board) => {
 
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
+  setPins(pieceLocations, whiteAttacks, blackAttacks);
+
   return {
     pieceLocations: pieceLocations,
-    checks: { black: checksOnBlack, white: checksOnWhite },
+    checks: {
+      black: {
+        piecesChecking: checksOnBlack.piecesChecking,
+        isInCheck: checksOnBlack.isInCheck,
+      },
+      white: {
+        piecesChecking: checksOnWhite.piecesChecking,
+        isInCheck: checksOnWhite.isInCheck,
+      },
+    },
   };
 };
 
@@ -65,6 +84,7 @@ const calculateMoves = (
   currentLocs,
   oppositeLocs,
   currentAttacks,
+  currentPinningAttacks,
   currentProtections,
   currentMoves,
   pieceLocations,
@@ -80,6 +100,23 @@ const calculateMoves = (
       );
 
       currentAttacks.push(checkPawnAttacks(moveData, currentTile));
+      if (piece === "bishop") {
+        currentPinningAttacks.bishops.push(
+          checkPawnAttacks(moveData, currentTile)
+        );
+      }
+
+      if (piece === "rook") {
+        currentPinningAttacks.rooks.push(
+          checkPawnAttacks(moveData, currentTile)
+        );
+      }
+
+      if (piece === "queen") {
+        currentPinningAttacks.queens.push(
+          checkPawnAttacks(moveData, currentTile)
+        );
+      }
 
       currentMoves.push({
         moves: moveData.moves,
@@ -164,26 +201,25 @@ const checkForChecks = (
 
   enemyAttacks.forEach((enemyAttack) => {
     if (enemyAttack.potentialAttacks)
-      console.log(enemyAttack.potentialAttacks, enemyAttack.currentTile.value);
-    for (const attack of enemyAttack.attacks) {
-      if (attack.x === x && attack.y === y) {
-        isInCheck = true;
-        piecesChecking.push({
-          attack,
-          attackingFrom: enemyAttack.currentTile,
-          attackingPiece: enemyAttack.piece,
-        });
+      for (const attack of enemyAttack.attacks) {
+        if (attack.x === x && attack.y === y) {
+          isInCheck = true;
+          piecesChecking.push({
+            attack,
+            attackingFrom: enemyAttack.currentTile,
+            attackingPiece: enemyAttack.piece,
+          });
+        }
+
+        //all places that enemy is attacking an ally piece, which king cant move to
+        filteredKingAttacks = filteredKingAttacks.filter(
+          (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
+        );
+
+        filteredKingMoves = filteredKingMoves.filter(
+          (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
+        );
       }
-
-      //all places that enemy is attacking an ally piece, which king cant move to
-      filteredKingAttacks = filteredKingAttacks.filter(
-        (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
-      );
-
-      filteredKingMoves = filteredKingMoves.filter(
-        (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
-      );
-    }
 
     //Potential attacks from pawns.
     if (enemyAttack.potentialAttacks) {
@@ -250,4 +286,13 @@ const checkPawnAttacks = (moveData, currentTile) => {
     attacks: moveData.attacks,
     currentTile,
   };
+};
+
+const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
+  const { white, black } = pieceLocations;
+
+  const whitePiecesUnderAttack = [];
+  console.log(pieceLocations);
+  console.log(whiteAttacks);
+  console.log(blackAttacks);
 };
