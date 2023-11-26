@@ -92,12 +92,15 @@ const calculateMoves = (
 ) => {
   Object.keys(currentLocs).forEach((piece) => {
     pieceLocations[color][piece] = currentLocs[piece].map((currentTile) => {
+      //TODO: make this function keep a track of the tile that it is attacking.
       const moveData = moveMap[piece].findTiles(
         currentTile,
         Object.values(currentLocs).flat(),
         Object.values(oppositeLocs).flat(),
         color
       );
+
+      console.log(moveData);
 
       currentAttacks.push(checkPawnAttacks(moveData, currentTile));
       if (piece === "bishop") {
@@ -292,7 +295,4 @@ const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
   const { white, black } = pieceLocations;
 
   const whitePiecesUnderAttack = [];
-  console.log(pieceLocations);
-  console.log(whiteAttacks);
-  console.log(blackAttacks);
 };
