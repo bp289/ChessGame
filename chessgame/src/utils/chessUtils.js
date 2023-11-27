@@ -63,7 +63,7 @@ export const legalMoves = (board) => {
 
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
-  setPins(pieceLocations, whiteAttacks, blackAttacks);
+  setPins(pieceLocations, pinningAttacksWhite, pinningAttacksBlack);
 
   return {
     pieceLocations: pieceLocations,
@@ -92,15 +92,12 @@ const calculateMoves = (
 ) => {
   Object.keys(currentLocs).forEach((piece) => {
     pieceLocations[color][piece] = currentLocs[piece].map((currentTile) => {
-      //TODO: make this function keep a track of the tile that it is attacking.
       const moveData = moveMap[piece].findTiles(
         currentTile,
         Object.values(currentLocs).flat(),
         Object.values(oppositeLocs).flat(),
         color
       );
-
-      console.log(moveData);
 
       currentAttacks.push(checkPawnAttacks(moveData, currentTile));
       if (piece === "bishop") {
@@ -294,5 +291,26 @@ const checkPawnAttacks = (moveData, currentTile) => {
 const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
   const { white, black } = pieceLocations;
 
-  const whitePiecesUnderAttack = [];
+  findAttacks(blackAttacks, white);
+  const whitePiecesUnderAttack = {
+    pawn: [],
+    rook: [],
+    queen: [],
+    king: [],
+    bishop: [],
+    knight: [],
+  };
+};
+
+const findAttacks = (enemyAttacks, allyLocations) => {
+  const { queens, rooks, bishops } = enemyAttacks;
+
+  const attackedAllyLocations = {};
+
+  for (const allyPieceType in allyLocations) {
+    const currentPieceType = allyLocations[allyPieceType];
+    currentPieceType.forEach((piece) => {
+      const { x, y } = piece.currentlyAt;
+    });
+  }
 };
