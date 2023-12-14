@@ -63,7 +63,11 @@ export const legalMoves = (board) => {
 
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
-  setPins(pieceLocations, pinningAttacksWhite, pinningAttacksBlack);
+  pieceLocations = setPins(
+    pieceLocations,
+    pinningAttacksWhite,
+    pinningAttacksBlack
+  );
 
   return {
     pieceLocations: pieceLocations,
@@ -291,7 +295,8 @@ const checkPawnAttacks = (moveData, currentTile) => {
 const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
   const { white, black } = pieceLocations;
 
-  findAttacks(blackAttacks, white);
+  const pinnedWhitePieces = findAttacks(whiteAttacks, { ...white });
+  const pinnedBlackPieces = findAttacks(blackAttacks, { ...black });
   const whitePiecesUnderAttack = {
     pawn: [],
     rook: [],
@@ -300,17 +305,28 @@ const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
     bishop: [],
     knight: [],
   };
+  return pieceLocations;
 };
 
 const findAttacks = (enemyAttacks, allyLocations) => {
   const { queens, rooks, bishops } = enemyAttacks;
+  let allyLocationsWithPins = { ...allyLocations };
 
-  const attackedAllyLocations = {};
+  allyLocations = checkForPins(queens, allyLocations);
+  allyLocations = checkForPins(rooks, allyLocations);
+  allyLocations = checkForPins(bishops, allyLocations);
+};
 
-  for (const allyPieceType in allyLocations) {
-    const currentPieceType = allyLocations[allyPieceType];
-    currentPieceType.forEach((piece) => {
-      const { x, y } = piece.currentlyAt;
-    });
-  }
+const checkForPins = (attackingPieces, allyLocations) => {
+  console.log(attackingPieces);
+  attackingPieces.forEach((piece) => {
+    if (piece.attacks.length > 0) {
+      console.log(piece);
+      const { pieceOnTile } = piece.attacks.map();
+    }
+    // find attacks if the piece under attack dissapears.
+    // will any of these be attacks against the king ?
+    // if yes -> set piece as pinned
+    // if no -> do nothing.
+  });
 };
