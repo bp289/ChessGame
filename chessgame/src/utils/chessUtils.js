@@ -295,38 +295,71 @@ const checkPawnAttacks = (moveData, currentTile) => {
 const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
   const { white, black } = pieceLocations;
 
-  const pinnedWhitePieces = findAttacks(whiteAttacks, { ...white });
-  const pinnedBlackPieces = findAttacks(blackAttacks, { ...black });
-  const whitePiecesUnderAttack = {
-    pawn: [],
-    rook: [],
-    queen: [],
-    king: [],
-    bishop: [],
-    knight: [],
-  };
+  const pinnedBlackPieces = findAttacks(
+    whiteAttacks,
+    { ...black },
+    { ...white }
+  );
+  const pinnedWhitePieces = findAttacks(
+    blackAttacks,
+    { ...white },
+    { ...black },
+    pieceLocations
+  );
+
   return pieceLocations;
 };
 
-const findAttacks = (enemyAttacks, allyLocations) => {
+const findAttacks = (enemyAttacks, allyLocations, enemyLocations) => {
   const { queens, rooks, bishops } = enemyAttacks;
-  let allyLocationsWithPins = { ...allyLocations };
 
-  allyLocations = checkForPins(queens, allyLocations);
-  allyLocations = checkForPins(rooks, allyLocations);
-  allyLocations = checkForPins(bishops, allyLocations);
+  const queenPins = checkForPins(
+    queens,
+    allyLocations,
+    enemyLocations,
+    "queen"
+  );
+  const rookPins = checkForPins(rooks, allyLocations, enemyLocations, "rook");
+  const bishopPins = checkForPins(
+    bishops,
+    allyLocations,
+    enemyLocations,
+    "bishop"
+  );
 };
 
-const checkForPins = (attackingPieces, allyLocations) => {
-  console.log(attackingPieces);
+const checkForPins = (
+  attackingPieces,
+  allyLocations,
+  enemyLocations,
+  pieceName
+) => {
   attackingPieces.forEach((piece) => {
-    if (piece.attacks.length > 0) {
-      console.log(piece);
-      const { pieceOnTile } = piece.attacks.map();
+    const { attacks, currentTile } = piece;
+
+    if (attacks.length > 0) {
+      attacks.map((attack) => {
+        const { pieceUnderAttack } = attack;
+        const { pieceOnTile, value, x, y } = pieceUnderAttack;
+        const { name } = pieceOnTile;
+
+        const newAllyLocations = { ...allyLocations };
+        newAllyLocations[name] = newAllyLocations[name].filter(
+          (piece) => piece.currentlyAt.value !== value
+        );
+
+        const movesWithoutPieceUnderAttack = moveMap[pieceName].findTiles(
+          currentTile,
+          enemyLocations,
+          newAllyLocations,
+          currentTile.pieceOnTile.color
+        );
+        return attack;
+      });
     }
-    // find attacks if the piece under attack dissapears.
-    // will any of these be attacks against the king ?
-    // if yes -> set piece as pinned
+
+    // check here if movesWithoutPieceUnderAttack  has any attacks for the king.
+    // if yes -> set piece as pinned, find direction of pin
     // if no -> do nothing.
   });
 };

@@ -51,6 +51,7 @@ export default function Chessboard() {
   useEffect(() => {
     const updateBoard = (tile) => {
       console.log("updating board, the selected tile is", tile);
+
       setBoard(showMovesOnBoard(currentLegalMoves, tile, board));
     };
     if (selectedTile) {
@@ -66,6 +67,7 @@ export default function Chessboard() {
       <div className="board">
         {board.map((e) => (
           <Tile
+            key={e.value}
             tileData={e}
             selectTile={handleSelectTile}
             updateBoard={updateBoard}
