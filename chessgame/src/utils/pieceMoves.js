@@ -89,7 +89,7 @@ export const moveMap = {
   rook: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
       const directions = createDirections("straight");
-
+      console.log(allyLocations, enemyLocations);
       return getMoves(
         allyLocations,
         enemyLocations,

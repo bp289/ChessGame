@@ -63,8 +63,10 @@ export const legalMoves = (board) => {
 
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
-  pieceLocations = setPins(
+  const pinnedLocations = setPins(
     pieceLocations,
+    whiteLoc,
+    blackLoc,
     pinningAttacksWhite,
     pinningAttacksBlack
   );
@@ -292,9 +294,7 @@ const checkPawnAttacks = (moveData, currentTile) => {
   };
 };
 
-const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
-  const { white, black } = pieceLocations;
-
+const setPins = (pieceLocations, white, black, whiteAttacks, blackAttacks) => {
   const pinnedBlackPieces = findAttacks(
     whiteAttacks,
     { ...black },
@@ -310,8 +310,8 @@ const setPins = (pieceLocations, whiteAttacks, blackAttacks) => {
   return pieceLocations;
 };
 
-const findAttacks = (enemyAttacks, allyLocations, enemyLocations) => {
-  const { queens, rooks, bishops } = enemyAttacks;
+const findAttacks = (enemysPinAttacks, allyLocations, enemyLocations) => {
+  const { queens, rooks, bishops } = enemysPinAttacks;
 
   const queenPins = checkForPins(
     queens,
@@ -329,31 +329,46 @@ const findAttacks = (enemyAttacks, allyLocations, enemyLocations) => {
 };
 
 const checkForPins = (
-  attackingPieces,
+  pinningPieces,
   allyLocations,
   enemyLocations,
   pieceName
 ) => {
-  attackingPieces.forEach((piece) => {
-    const { attacks, currentTile } = piece;
+  pinningPieces.forEach((piece) => {
+    const {
+      attacks,
+      currentTile: {
+        pieceOnTile: { name: enemyName, color: enemyColor },
+      },
+    } = piece;
 
     if (attacks.length > 0) {
       attacks.map((attack) => {
-        const { pieceUnderAttack } = attack;
-        const { pieceOnTile, value, x, y } = pieceUnderAttack;
-        const { name } = pieceOnTile;
+        const {
+          pieceUnderAttack: {
+            pieceOnTile: { name },
+            value: pieceUnderAttackValue,
+            x,
+            y,
+          },
+        } = attack;
 
+        const pieceUnderAttackXY = { x, y };
         const newAllyLocations = { ...allyLocations };
+
         newAllyLocations[name] = newAllyLocations[name].filter(
-          (piece) => piece.currentlyAt.value !== value
+          (currentPiece) => currentPiece.value !== pieceUnderAttackValue
         );
 
         const movesWithoutPieceUnderAttack = moveMap[pieceName].findTiles(
-          currentTile,
-          enemyLocations,
-          newAllyLocations,
-          currentTile.pieceOnTile.color
+          piece.currentTile,
+          Object.values(newAllyLocations).flat(),
+          Object.values(enemyLocations).flat(),
+          enemyColor
         );
+
+        console.log(enemyName, movesWithoutPieceUnderAttack);
+
         return attack;
       });
     }
