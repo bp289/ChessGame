@@ -338,12 +338,14 @@ const checkForPins = (
     const {
       attacks,
       currentTile: {
+        value: enemyValue,
         pieceOnTile: { name: enemyName, color: enemyColor },
       },
     } = piece;
 
     if (attacks.length > 0) {
-      attacks.map((attack) => {
+      console.warn("attacker ->", enemyName, enemyValue);
+      const pinnedPieces = attacks.map((attack) => {
         const {
           pieceUnderAttack: {
             pieceOnTile: { name },
@@ -367,7 +369,17 @@ const checkForPins = (
           enemyColor
         );
 
-        console.log(enemyName, movesWithoutPieceUnderAttack);
+        const isPinned = movesWithoutPieceUnderAttack.attacks.some(
+          (attack) => attack.pieceUnderAttack.pieceOnTile.name === "king"
+        );
+
+        console.log(
+          "victim ->",
+          name,
+          pieceUnderAttackValue,
+          "is pinned:",
+          isPinned
+        );
 
         return attack;
       });
