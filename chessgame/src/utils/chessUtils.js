@@ -340,8 +340,12 @@ const checkForPins = (
       currentTile: {
         value: enemyValue,
         pieceOnTile: { name: enemyName, color: enemyColor },
+        x,
+        y,
       },
     } = piece;
+
+    const attackerXY = { x, y };
 
     if (attacks.length > 0) {
       console.warn("attacker ->", enemyName, enemyValue);
@@ -373,13 +377,11 @@ const checkForPins = (
           (attack) => attack.pieceUnderAttack.pieceOnTile.name === "king"
         );
 
-        console.log(
-          "victim ->",
-          name,
-          pieceUnderAttackValue,
-          "is pinned:",
-          isPinned
-        );
+        if (isPinned) {
+          console.log("victim ->", name, attack, "is pinned:", isPinned);
+          console.log(pinDirectionAndDistance(pieceUnderAttackXY, attackerXY));
+        }
+        // find the direction from which you are being attacked from
 
         return attack;
       });
@@ -389,4 +391,23 @@ const checkForPins = (
     // if yes -> set piece as pinned, find direction of pin
     // if no -> do nothing.
   });
+};
+
+const pinDirectionAndDistance = (victim, attacker) => {
+  console.log(victim, attacker);
+  const deltaX = attacker.x - victim.x;
+  const deltaY = attacker.y - victim.y;
+
+  console.log(deltaX, deltaY);
+  if (deltaX === 0) {
+    return { direction: "Vertical", distance: deltaY };
+  } else if (deltaY === 0) {
+    return { direction: "Horizontal", distance: deltaX };
+  } else {
+    return {
+      direction: "Diagonal",
+      distanceX: deltaX,
+      distanceY: deltaY,
+    };
+  }
 };

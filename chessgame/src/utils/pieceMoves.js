@@ -1,4 +1,5 @@
 import { createDirections, createPawnDirections } from "./directionConstants";
+
 export const moveMap = {
   pawn: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
