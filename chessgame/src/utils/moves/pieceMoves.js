@@ -1,4 +1,7 @@
-import { createDirections, createPawnDirections } from "./directionConstants";
+import {
+  createDirections,
+  createPawnDirections,
+} from "../constants/directionConstants";
 
 export const moveMap = {
   pawn: {
