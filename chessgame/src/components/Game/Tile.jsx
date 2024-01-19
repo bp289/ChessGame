@@ -37,10 +37,10 @@ export default function Tile({
       }}
       onDragEnter={() => {
         console.log("MouseEnter");
-      }}
-    >
+      }}>
       {tileData.pieceOnTile.name && (
         <img
+          className="chess-piece"
           src={require(`../../Assets/${tileData.pieceOnTile.color}-${tileData.pieceOnTile.name}.svg.png`)}
           alt={`${tileData.pieceOnTile.name}-${tileData.pieceOnTile.color}`}
         />

@@ -13,13 +13,16 @@
   height: 100px;
   font-size: 30px;
   text-align: center;
-  @apply select-none;
+  /* @apply select-none; */
 }
 
 .board div img {
   height: 80px;
-  @apply m-2 cursor-pointer select-none object-contain;
-  pointer-events: none;
+  /* @apply m-2 cursor-pointer select-none object-contain; */
+  cursor: grab;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 .light {
   background-color: rgba(255, 255, 255, 0.8);
@@ -46,4 +49,7 @@
 
 .dark-movable {
   background-color: rgb(188, 242, 149);
+}
+
+.chess-piece {
 }
