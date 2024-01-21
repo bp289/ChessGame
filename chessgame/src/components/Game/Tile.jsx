@@ -4,39 +4,36 @@ export default function Tile({
   tileData,
   selectTile,
   selectedTile,
+  updateBoard,
   movePiece,
   deSelect,
 }) {
   const [turn, toggleTurn] = useTurn();
+
   const selectCurrentTile = (tileData) => {
-    if (tileData.pieceOnTile.name) {
-      if (tileData.pieceOnTile.color === turn) {
-        selectTile(tileData);
-      }
+    const {
+      pieceOnTile: { name, color },
+      cellState,
+    } = tileData;
+    if (name && color === turn) {
+      selectTile(tileData);
     }
-    if (
-      selectedTile &&
-      !tileData.pieceOnTile.name &&
-      tileData.styleClass === "movable"
-    ) {
+    if (selectedTile && !name && cellState === "movable") {
       movePiece(tileData);
     }
-    if (
-      selectedTile &&
-      !tileData.styleClass === "movable" &&
-      !tileData.styleClass === "selected"
-    ) {
+    if (selectedTile && !cellState === "movable" && !cellState === "selected") {
+      deSelect();
+    }
+    if (selectedTile && cellState === "selected") {
       deSelect();
     }
   };
   return (
     <div
-      className={tileData.styleClass}
+      className={tileData.cellType}
+      data-state={tileData.cellState}
       onClick={() => {
         selectCurrentTile(tileData);
-      }}
-      onDragEnter={() => {
-        console.log("MouseEnter");
       }}>
       {tileData.pieceOnTile.name && (
         <img

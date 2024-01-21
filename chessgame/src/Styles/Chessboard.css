@@ -9,16 +9,13 @@
 }
 
 .board > * {
-  width: 100px;
-  height: 100px;
-  font-size: 30px;
-  text-align: center;
-  /* @apply select-none; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .board div img {
   height: 80px;
-  /* @apply m-2 cursor-pointer select-none object-contain; */
   cursor: grab;
   -moz-user-select: none;
   -webkit-user-select: none;
@@ -32,23 +29,23 @@
   background-color: #eda04d;
 }
 
-.dark-selected {
+.light[data-state="selected"],
+.dark[data-state="selected"] {
   background-color: rgba(195, 250, 174, 0.603);
 }
 
-.light-selected {
-  background-color: rgba(195, 250, 174, 0.603);
-}
-
-.movable {
+.dark[data-state="movable"],
+.light[data-state="movable"] {
   background-color: rgb(188, 242, 149);
 }
-.takeable {
+
+.light[data-state="takeable"],
+.dark[data-state="takeable"] {
   background-color: red;
 }
 
-.dark-movable {
-  background-color: rgb(188, 242, 149);
+.dark[data-state="takeable"] {
+  background-color: red;
 }
 
 .chess-piece {

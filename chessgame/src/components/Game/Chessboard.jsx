@@ -1,7 +1,7 @@
 import "../../Styles/Chessboard.css";
 import { useTurn } from "../../Contexts/TurnContext.js";
 import Tile from "./Tile.jsx";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { legalMoves } from "../../utils/moves/chessUtils.js";
 import {
   startBoard,
@@ -12,34 +12,27 @@ import {
 
 export default function Chessboard() {
   const [turn, toggleTurn] = useTurn();
-
   const [board, setBoard] = useState(startBoard);
-  const [currentLegalMoves, setCurrentLegalMoves] = useState();
-
-  useMemo(
-    () => setCurrentLegalMoves(legalMoves([...board])),
-    [setCurrentLegalMoves]
+  const [currentLegalMoves, setCurrentLegalMoves] = useState(
+    legalMoves([...board])
   );
 
   const [selectedTile, setSelectedTile] = useState();
 
-  const updateBoard = (tile) => {
-    setBoard(showMovesOnBoard(currentLegalMoves, tile, board));
-  };
+  const updateBoardState = (tile) =>
+    tile
+      ? setBoard(showMovesOnBoard(currentLegalMoves, tile, board))
+      : setBoard(unSelect(board));
 
   const handleSelectTile = (tile) => {
-    setSelectedTile((prev) => {
-      if (prev?.value === tile.value) {
-        return undefined;
-      } else {
-        return tile;
-      }
-    });
+    setSelectedTile((prev) => (prev?.value === tile.value ? null : tile));
+    updateBoardState(tile);
   };
 
-  const deSelect = () => {
+  const handleDeSelect = useCallback(() => {
+    // setSelectedTile(null);
     setBoard(unSelect(board));
-  };
+  }, [board]);
 
   const handlePieceMove = (destinationTile) => {
     const newBoard = getBoardAfterMove(board, selectedTile, destinationTile);
@@ -47,18 +40,6 @@ export default function Chessboard() {
     setCurrentLegalMoves(legalMoves([...newBoard]));
     toggleTurn();
   };
-
-  useEffect(() => {
-    const updateBoard = (tile) => {
-      console.warn("updating board, the selected tile is", tile);
-      setBoard(showMovesOnBoard(currentLegalMoves, tile, board));
-    };
-    if (selectedTile) {
-      updateBoard(selectedTile);
-    } else {
-      setBoard(unSelect(board));
-    }
-  }, [selectedTile]);
 
   return (
     <>
@@ -69,10 +50,9 @@ export default function Chessboard() {
             key={e.value}
             tileData={e}
             selectTile={handleSelectTile}
-            updateBoard={updateBoard}
             selectedTile={selectedTile}
             movePiece={handlePieceMove}
-            deSelect={deSelect}
+            deSelect={handleDeSelect}
           />
         ))}
       </div>
