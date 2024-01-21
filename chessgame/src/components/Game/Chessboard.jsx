@@ -2,13 +2,14 @@ import "../../Styles/Chessboard.css";
 import { useTurn } from "../../Contexts/TurnContext.js";
 import Tile from "./Tile.jsx";
 import { useEffect, useState, useCallback } from "react";
-import { legalMoves } from "../../utils/moves/chessUtils.js";
+import { legalMoves } from "../../utils/moves/moveCalculations.js";
+import { startBoard } from "../../utils/board/startBoard.js";
+
 import {
-  startBoard,
   showMovesOnBoard,
   getBoardAfterMove,
   unSelect,
-} from "../../utils/board/chessBoardUtils.js";
+} from "../../utils/board/chessBoardUI.js";
 
 export default function Chessboard() {
   const [turn, toggleTurn] = useTurn();
