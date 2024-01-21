@@ -61,16 +61,16 @@ export const showMovesOnBoard = (
         styleClass: `${findStyleClass(tile.x, tile.y)}-selected`,
       };
     } else {
-      for (let i = 0; i < normalMoves?.length; i++) {
-        if (normalMoves[i].x === tile.x && normalMoves[i].y === tile.y) {
+      for (let normalMove of normalMoves) {
+        if (normalMove.x === tile.x && normalMove.y === tile.y) {
           return {
             ...tile,
             styleClass: "movable",
           };
         }
       }
-      for (let i = 0; i < attackMoves.length; i++) {
-        const { pieceUnderAttack } = attackMoves[i];
+      for (let attackMove of attackMoves) {
+        const { pieceUnderAttack } = attackMove;
         if (pieceUnderAttack?.x === tile.x && pieceUnderAttack?.y === tile.y) {
           return {
             ...tile,
