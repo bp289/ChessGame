@@ -6,9 +6,8 @@ import {
 export const moveMap = {
   pawn: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
-      const { normal, attack } = createPawnDirections(color);
-      const directions = normal;
-      const attackDirections = attack;
+      const { normal: directions, attack: attackDirections } =
+        createPawnDirections(color);
 
       const firstMove = currentTile.pieceOnTile?.firstMove ? 2 : 1;
 
@@ -24,7 +23,7 @@ export const moveMap = {
       return {
         moves: getMoves(
           allyLocations,
-          [],
+          enemyLocations,
           directions,
           currentTile,
           firstMove,

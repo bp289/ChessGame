@@ -70,7 +70,8 @@ export const showMovesOnBoard = (
         }
       }
       for (let i = 0; i < attackMoves.length; i++) {
-        if (attackMoves[i]?.x === tile.x && attackMoves[i]?.y === tile.y) {
+        const { pieceUnderAttack } = attackMoves[i];
+        if (pieceUnderAttack?.x === tile.x && pieceUnderAttack?.y === tile.y) {
           return {
             ...tile,
             styleClass: "takeable",
@@ -121,15 +122,17 @@ export const unSelect = (board) => {
 };
 
 const getMoves = (pieceLocations, selectedTile) => {
-  const result = pieceLocations[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].find((e) => e.currentlyAt.value === selectedTile.value).legalMoves;
-
-  return result;
+  const color = selectedTile.pieceOnTile?.color;
+  const name = selectedTile?.pieceOnTile.name;
+  return pieceLocations[color][name].find(
+    (e) => e.currentlyAt.value === selectedTile.value
+  ).legalMoves;
 };
 
 const getAttacks = (pieceLocations, selectedTile) => {
-  return pieceLocations[selectedTile.pieceOnTile?.color][
-    selectedTile?.pieceOnTile.name
-  ].filter((e) => e.currentlyAt.value === selectedTile.value)[0]?.legalAttacks;
+  const color = selectedTile.pieceOnTile?.color;
+  const name = selectedTile?.pieceOnTile.name;
+  return pieceLocations[color][name].filter(
+    (e) => e.currentlyAt.value === selectedTile.value
+  )[0]?.legalAttacks;
 };

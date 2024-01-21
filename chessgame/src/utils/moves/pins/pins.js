@@ -22,8 +22,6 @@ export const setPins = (
     pieceLocations.white
   );
 
-  console.log(pinnedWhitePieces);
-
   return { white: pinnedWhitePieces, black: pinnedBlackPieces };
 };
 

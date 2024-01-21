@@ -50,7 +50,7 @@ export default function Chessboard() {
 
   useEffect(() => {
     const updateBoard = (tile) => {
-      console.log("updating board, the selected tile is", tile);
+      console.warn("updating board, the selected tile is", tile);
       setBoard(showMovesOnBoard(currentLegalMoves, tile, board));
     };
     if (selectedTile) {
