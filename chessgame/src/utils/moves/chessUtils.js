@@ -65,7 +65,7 @@ export const legalMoves = (board) => {
 
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
-  const pinnedLocations = setPins(
+  pieceLocations = setPins(
     pieceLocations,
     whiteLoc,
     blackLoc,

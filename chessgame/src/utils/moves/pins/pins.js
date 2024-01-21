@@ -24,7 +24,7 @@ export const setPins = (
 
   console.log(pinnedWhitePieces);
 
-  return pieceLocations;
+  return { white: pinnedWhitePieces, black: pinnedBlackPieces };
 };
 
 const reducedPinAttacks = (
@@ -35,23 +35,25 @@ const reducedPinAttacks = (
 ) => {
   const { queens, rooks, bishops } = enemysPinAttacks;
   // const pieceInfo = { ...pieceLocations };
-
+  let pieceData = { ...pieceLocations };
   const queenPins = checkForPins(
     queens,
     allyLocations,
     enemyLocations,
     "queen"
   );
-  filterMovesFromPins(queenPins, pieceLocations);
+  pieceData = filterMovesFromPins(queenPins, pieceData);
   const rookPins = checkForPins(rooks, allyLocations, enemyLocations, "rook");
+  pieceData = filterMovesFromPins(rookPins, pieceData);
   const bishopPins = checkForPins(
     bishops,
     allyLocations,
     enemyLocations,
     "bishop"
   );
+  pieceData = filterMovesFromPins(bishopPins, pieceData);
 
-  return { queenPins, rookPins, bishopPins };
+  return pieceData;
 };
 
 const checkForPins = (
@@ -141,7 +143,6 @@ const checkForPins = (
 };
 
 const filterMovesFromPins = (pinnedPieces, allPieceData) => {
-  console.log(pinnedPieces);
   for (let piece in pinnedPieces) {
     const currentPins = pinnedPieces[piece];
 
@@ -154,22 +155,27 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
         allowedMoves, //TODO: MAKE SURE THIS IS THE ONLY MOVES BEING USED BY THE PIECE
       } = piece;
 
-      console.log(pinnedValue, name, allowedMoves);
-
       allPieceData[name].forEach((piece, index) => {
         if (piece.currentlyAt.value === pinnedValue) {
-          console.log(allPieceData[name][index]);
-          allPieceData[name][index].legalMoves.filter((move) => {
-            console.log(move);
+          allPieceData[name][index].legalMoves = allPieceData[name][
+            index
+          ].legalMoves.filter((move) =>
+            allowedMoves.some((allowedMove) => xyMatch(move, allowedMove))
+          );
 
-            //TODO: filter allPieceData, make sure all moves are allowed with the pins
-          });
-
-          allPieceData[name][index].legalAttacks.filter((attack) => {
-            console.log(attack.attackingTile);
-          });
+          allPieceData[name][index].legalAttacks = allPieceData[name][
+            index
+          ].legalAttacks.filter((attack) =>
+            allowedMoves.some((allowedMove) =>
+              xyMatch(attack.pieceUnderAttack, allowedMove)
+            )
+          );
         }
       });
     });
   }
+
+  return allPieceData;
 };
+
+const xyMatch = (xy1, xy2) => xy1.x === xy2.x && xy1.y === xy2.y;
