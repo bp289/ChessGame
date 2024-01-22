@@ -1,7 +1,7 @@
 import "../../Styles/Chessboard.css";
 import { useTurn } from "../../Contexts/TurnContext.js";
 import Tile from "./Tile.jsx";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { legalMoves } from "../../utils/moves/moveCalculations.js";
 import { startBoard } from "../../utils/board/startBoard.js";
 
@@ -19,28 +19,49 @@ export default function Chessboard() {
   );
 
   const [selectedTile, setSelectedTile] = useState();
+  const [takenPieces, setTakenPieces] = useState({ white: [], black: [] });
 
-  const updateBoardState = (tile) =>
-    tile
-      ? setBoard(showMovesOnBoard(currentLegalMoves, tile, board))
-      : setBoard(unSelect(board));
+  const updateBoardState = useCallback(
+    (tile) => {
+      return tile
+        ? setBoard(showMovesOnBoard(currentLegalMoves, tile, board))
+        : setBoard(unSelect(board));
+    },
+    [board, currentLegalMoves]
+  );
 
-  const handleSelectTile = (tile) => {
-    setSelectedTile((prev) => (prev?.value === tile.value ? null : tile));
-    updateBoardState(tile);
-  };
+  const handleSelectTile = useCallback(
+    (tile) => {
+      setSelectedTile((prev) => (prev?.value === tile.value ? null : tile));
+      updateBoardState(tile);
+    },
+    [updateBoardState]
+  );
 
   const handleDeSelect = useCallback(() => {
-    // setSelectedTile(null);
     setBoard(unSelect(board));
+    setSelectedTile(null);
   }, [board]);
 
-  const handlePieceMove = (destinationTile) => {
-    const newBoard = getBoardAfterMove(board, selectedTile, destinationTile);
-    setBoard(newBoard);
-    setCurrentLegalMoves(legalMoves([...newBoard]));
-    toggleTurn();
-  };
+  const handlePieceMove = useCallback(
+    (destinationTile) => {
+      const { newBoard, takenPiece } = getBoardAfterMove(
+        board,
+        selectedTile,
+        destinationTile
+      );
+      setBoard(newBoard);
+      setCurrentLegalMoves(legalMoves([...newBoard]));
+      setSelectedTile(null);
+      toggleTurn();
+
+      if (takenPiece) {
+        takenPieces[takenPiece.color].push(takenPiece);
+        setTakenPieces({ ...takenPieces });
+      }
+    },
+    [board, selectedTile, toggleTurn, takenPieces]
+  );
 
   return (
     <>

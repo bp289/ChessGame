@@ -129,8 +129,6 @@ const checkForPins = (
         // find the direction from which you are being attacked from
       }, []);
 
-      console.log(pinnedPieces);
-
       if (pinnedPieces.length > 0) {
         pins[enemyValue] = pinnedPieces;
       }

@@ -36,24 +36,24 @@ export const showMovesOnBoard = (
   });
 };
 export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
-  return board.map((tile) => {
-    if (tileToMoveTo === tile && tileToMoveTo.cellState === "movable") {
-      return {
-        ...tile,
-        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
-        cellState: "neutral",
-      };
+  const newBoard = board.map((tile) => {
+    // console.log(tileToMoveTo === tile, tile);
+    if (tileToMoveTo.value === tile.value) {
+      if (
+        tileToMoveTo.cellState === "movable" ||
+        tileToMoveTo.cellState === "takeable"
+      ) {
+        return {
+          ...tile,
+          pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
+          cellState: "neutral",
+        };
+      }
     } else if (tile.value === tileToMoveFrom.value) {
       return {
         ...tile,
         pieceOnTile: {},
         cellState: findCellType(tile.x, tile.y),
-      };
-    } else if (tileToMoveTo === tile && tileToMoveTo.cellState === "takeable") {
-      return {
-        ...tile,
-        pieceOnTile: { ...tileToMoveFrom.pieceOnTile, firstMove: false },
-        cellState: "neutral",
       };
     } else {
       return {
@@ -62,6 +62,11 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
       };
     }
   });
+
+  return {
+    newBoard,
+    takenPiece: tileToMoveTo.pieceOnTile.name ? tileToMoveTo.pieceOnTile : null,
+  };
 };
 
 export const unSelect = (board) => {

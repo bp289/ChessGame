@@ -18,14 +18,17 @@ export default function Tile({
     if (name && color === turn) {
       selectTile(tileData);
     }
-    if (selectedTile && !name && cellState === "movable") {
-      movePiece(tileData);
-    }
-    if (selectedTile && !cellState === "movable" && !cellState === "selected") {
-      deSelect();
-    }
-    if (selectedTile && cellState === "selected") {
-      deSelect();
+    if (selectedTile) {
+      if (cellState === "movable" || cellState === "takeable") {
+        movePiece(tileData);
+      }
+
+      if (
+        cellState === "selected" ||
+        (cellState === "neutral" && color !== turn)
+      ) {
+        deSelect();
+      }
     }
   };
   return (
