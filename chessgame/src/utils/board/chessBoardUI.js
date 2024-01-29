@@ -1,9 +1,5 @@
 import { findCellType } from "./startBoard";
-export const showMovesOnBoard = (
-  { pieceLocations, checks },
-  selectedTile,
-  board
-) => {
+export const showMovesOnBoard = ({ pieceLocations }, selectedTile, board) => {
   const { normalMoves, attackMoves } = getMoves(pieceLocations, selectedTile);
 
   return board.map((tile) => {

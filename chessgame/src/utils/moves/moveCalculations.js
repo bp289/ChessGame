@@ -75,7 +75,6 @@ export const legalMoves = (board) => {
     pinningAttacksWhite,
     pinningAttacksBlack
   );
-  console.log("running Legal Moves");
   return {
     pieceLocations: pieceLocations,
     checks: {

@@ -47,8 +47,6 @@ export default function Chessboard() {
 
   const handlePieceMove = useCallback(
     (destinationTile) => {
-      console.log("running handlePieceMove");
-
       const { newBoard, takenPiece } = getBoardAfterMove(
         board,
         selectedTile,
