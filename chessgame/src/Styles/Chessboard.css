@@ -44,8 +44,9 @@
   background-color: red;
 }
 
-.dark[data-state="takeable"] {
-  background-color: red;
+.light[data-state="check"],
+.dark[data-state="check"] {
+  background-color: rgb(214, 167, 167);
 }
 
 .chess-piece {

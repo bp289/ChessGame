@@ -283,13 +283,10 @@ function calculateAttacksAndMoves(
         ) {
           direction.blocked = true;
           if (location.pieceOnTile.color !== color) {
-            direction.attackTile.push({
-              attackingTile: currentDirection,
-              pieceUnderAttack: location,
-            });
+            direction.attackTile.push(location);
           } else if (location.pieceOnTile.color === color) {
             if (direction.protectingTile) {
-              direction?.protectingTile.push(currentDirection);
+              direction?.protectingTile.push(location);
             }
           }
         }

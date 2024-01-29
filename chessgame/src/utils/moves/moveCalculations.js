@@ -51,6 +51,7 @@ export const legalMoves = (board) => {
     pieceLocations.white.king[0].legalMoves,
     pieceLocations.white.king[0].legalAttacks
   );
+  //console.log("white checks", checksOnWhite);
 
   pieceLocations.white.king[0] = checksOnWhite.filteredKing;
 
@@ -63,6 +64,8 @@ export const legalMoves = (board) => {
     pieceLocations.black.king[0].legalAttacks
   );
 
+  //console.log("black checks", checksOnBlack);
+
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
 
   pieceLocations = setPins(
@@ -72,7 +75,7 @@ export const legalMoves = (board) => {
     pinningAttacksWhite,
     pinningAttacksBlack
   );
-
+  console.log("running Legal Moves");
   return {
     pieceLocations: pieceLocations,
     checks: {

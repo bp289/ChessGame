@@ -1,6 +1,6 @@
 import { moveMap } from "../pieceMoves";
 import { getValidMovesOnPin } from "./pinCalcs";
-
+import xyMatch from "../../constants/xyMatch";
 export const setPins = (
   pieceLocations,
   white,
@@ -77,12 +77,10 @@ const checkForPins = (
     if (attacks.length > 0) {
       const pinnedPieces = attacks.reduce((totalPinningAttacks, attack) => {
         const {
-          pieceUnderAttack: {
-            pieceOnTile: { name },
-            value: pieceUnderAttackValue,
-            x,
-            y,
-          },
+          pieceOnTile: { name },
+          value: pieceUnderAttackValue,
+          x,
+          y,
         } = attack;
 
         const pieceUnderAttackXY = { x, y };
@@ -100,14 +98,20 @@ const checkForPins = (
         );
 
         const attackOnKing = movesWithoutPieceUnderAttack.attacks.find(
-          (attack) => attack.pieceUnderAttack.pieceOnTile.name === "king"
+          (attack) => attack.pieceOnTile.name === "king"
         );
 
         if (attackOnKing) {
-          const { pieceUnderAttack: king } = attackOnKing;
+          const king = attackOnKing;
 
           const kingXY = { x: king.x, y: king.y };
-          console.log("victim ->", name, attack, "is pinned:", attackOnKing);
+          // console.log(
+          //   "victim ->",
+          //   name,
+          //   attack,
+          //   "is pinned:",
+          //   attackOnKing ? true : false
+          // );
 
           const moves = [
             getValidMovesOnPin(pieceUnderAttackXY, attackerXY),
@@ -117,7 +121,7 @@ const checkForPins = (
           ].flat();
 
           totalPinningAttacks.push({
-            pinnedPiece: attack.pieceUnderAttack,
+            pinnedPiece: attack,
             allowedMoves: moves,
           });
 
@@ -162,9 +166,7 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
           allPieceData[name][index].legalAttacks = allPieceData[name][
             index
           ].legalAttacks.filter((attack) =>
-            allowedMoves.some((allowedMove) =>
-              xyMatch(attack.pieceUnderAttack, allowedMove)
-            )
+            allowedMoves.some((allowedMove) => xyMatch(attack, allowedMove))
           );
         }
       });
@@ -173,5 +175,3 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
 
   return allPieceData;
 };
-
-const xyMatch = (xy1, xy2) => xy1.x === xy2.x && xy1.y === xy2.y;

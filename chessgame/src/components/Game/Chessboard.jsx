@@ -1,22 +1,24 @@
 import "../../Styles/Chessboard.css";
 import { useTurn } from "../../Contexts/TurnContext.js";
 import Tile from "./Tile.jsx";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { legalMoves } from "../../utils/moves/moveCalculations.js";
-import { startBoard } from "../../utils/board/startBoard.js";
+import { initializeBoard } from "../../utils/board/startBoard.js";
 
 import {
   showMovesOnBoard,
   getBoardAfterMove,
   unSelect,
 } from "../../utils/board/chessBoardUI.js";
+const startBoard = initializeBoard();
 
 export default function Chessboard() {
   const [turn, toggleTurn] = useTurn();
   const [board, setBoard] = useState(startBoard);
-  const [currentLegalMoves, setCurrentLegalMoves] = useState(
-    legalMoves([...board])
-  );
+  const [currentLegalMoves, setCurrentLegalMoves] = useState();
+
+  //this is to prevent the legal moves being run every render
+  useMemo(() => setCurrentLegalMoves(legalMoves(startBoard)), []);
 
   const [selectedTile, setSelectedTile] = useState();
   const [takenPieces, setTakenPieces] = useState({ white: [], black: [] });
@@ -45,6 +47,8 @@ export default function Chessboard() {
 
   const handlePieceMove = useCallback(
     (destinationTile) => {
+      console.log("running handlePieceMove");
+
       const { newBoard, takenPiece } = getBoardAfterMove(
         board,
         selectedTile,
@@ -53,12 +57,12 @@ export default function Chessboard() {
       setBoard(newBoard);
       setCurrentLegalMoves(legalMoves([...newBoard]));
       setSelectedTile(null);
-      toggleTurn();
 
       if (takenPiece) {
         takenPieces[takenPiece.color].push(takenPiece);
         setTakenPieces({ ...takenPieces });
       }
+      toggleTurn();
     },
     [board, selectedTile, toggleTurn, takenPieces]
   );

@@ -11,7 +11,7 @@ export default function TurnProvider({ children }) {
   const [turn, setTurn] = useState("white");
 
   const toggleTurn = () => {
-    console.log("updating");
+    console.log("updating turn");
     setTurn((prevTurn) => (prevTurn === "white" ? "black" : "white"));
   };
 

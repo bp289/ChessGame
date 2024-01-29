@@ -1,3 +1,5 @@
+import xyMatch from "../constants/xyMatch";
+
 export const checkForChecks = (
   currentLocation,
   enemyAttacks,
@@ -10,30 +12,28 @@ export const checkForChecks = (
   let filteredKingAttacks = [...kingsAttacks];
   let isInCheck = false;
   const piecesChecking = [];
-
-  const { x, y } = currentLocation;
-
+  //console.log("enemyAttaks", enemyAttacks);
   enemyAttacks.forEach((enemyAttack) => {
-    if (enemyAttack.potentialAttacks)
-      for (const attack of enemyAttack.attacks) {
-        if (attack.x === x && attack.y === y) {
-          isInCheck = true;
-          piecesChecking.push({
-            attack,
-            attackingFrom: enemyAttack.currentTile,
-            attackingPiece: enemyAttack.piece,
-          });
-        }
-
-        //all places that enemy is attacking an ally piece, which king cant move to
-        filteredKingAttacks = filteredKingAttacks.filter(
-          (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
-        );
-
-        filteredKingMoves = filteredKingMoves.filter(
-          (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
-        );
+    for (const attack of enemyAttack.attacks) {
+      if (xyMatch(attack, currentLocation)) {
+        isInCheck = true;
+        console.log(isInCheck);
+        piecesChecking.push({
+          attack,
+          attackingFrom: enemyAttack.currentTile,
+          attackingPiece: enemyAttack.piece,
+        });
       }
+
+      //all places that enemy is attacking an ally piece, which king cant move to
+      filteredKingAttacks = filteredKingAttacks.filter(
+        (kingAttack) => kingAttack.x !== attack.x || attack.y !== kingAttack.y
+      );
+
+      filteredKingMoves = filteredKingMoves.filter(
+        (kingMove) => kingMove.x !== attack.x || attack.y !== kingMove.y
+      );
+    }
 
     //Potential attacks from pawns.
     if (enemyAttack.potentialAttacks) {

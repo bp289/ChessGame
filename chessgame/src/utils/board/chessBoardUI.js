@@ -4,8 +4,7 @@ export const showMovesOnBoard = (
   selectedTile,
   board
 ) => {
-  const normalMoves = getMoves(pieceLocations, selectedTile);
-  const attackMoves = getAttacks(pieceLocations, selectedTile);
+  const { normalMoves, attackMoves } = getMoves(pieceLocations, selectedTile);
 
   return board.map((tile) => {
     if (tile.value === selectedTile.value) {
@@ -23,8 +22,7 @@ export const showMovesOnBoard = (
         }
       }
       for (let attackMove of attackMoves) {
-        const { pieceUnderAttack } = attackMove;
-        if (pieceUnderAttack?.x === tile.x && pieceUnderAttack?.y === tile.y) {
+        if (attackMove?.x === tile.x && attackMove?.y === tile.y) {
           return {
             ...tile,
             cellState: "takeable",
@@ -77,17 +75,10 @@ export const unSelect = (board) => {
 };
 
 const getMoves = (pieceLocations, selectedTile) => {
-  const color = selectedTile.pieceOnTile?.color;
-  const name = selectedTile?.pieceOnTile.name;
-  return pieceLocations[color][name].find(
+  const { name, color } = selectedTile?.pieceOnTile;
+  const { legalAttacks, legalMoves } = pieceLocations[color][name].find(
     (e) => e.currentlyAt.value === selectedTile.value
-  ).legalMoves;
-};
+  );
 
-const getAttacks = (pieceLocations, selectedTile) => {
-  const color = selectedTile.pieceOnTile?.color;
-  const name = selectedTile?.pieceOnTile.name;
-  return pieceLocations[color][name].filter(
-    (e) => e.currentlyAt.value === selectedTile.value
-  )[0]?.legalAttacks;
+  return { normalMoves: legalMoves, attackMoves: legalAttacks };
 };
