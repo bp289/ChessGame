@@ -3,6 +3,8 @@ import {
   createPawnDirections,
 } from "../constants/directionConstants";
 
+import { isValidCoordinate } from "../constants/coordinateValidation";
+
 export const moveMap = {
   pawn: {
     findTiles: (currentTile, allyLocations, enemyLocations, color) => {
@@ -299,8 +301,4 @@ function calculateAttacksAndMoves(
       direction.blocked = true;
     }
   }
-}
-
-function isValidCoordinate(x, y) {
-  return x >= 1 && x <= 8 && y >= 1 && y <= 8;
 }

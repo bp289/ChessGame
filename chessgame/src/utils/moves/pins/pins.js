@@ -1,6 +1,11 @@
 import { moveMap } from "../pieceMoves";
 import { getValidMovesOnPin } from "./pinCalcs";
-import xyMatch from "../../constants/xyMatch";
+import {
+  xyMatch,
+  isValidCoordinate,
+} from "../../constants/coordinateValidation";
+import { createDirections } from "../../constants/directionConstants";
+
 export const setPins = (
   pieceLocations,
   white,
@@ -83,7 +88,16 @@ const checkForPins = (
           y,
         } = attack;
 
+        const kingOnSameDiagonal = isKingOnSameDiagonal(
+          attack,
+          [
+            Object.values(allyLocations).flat(),
+            Object.values(enemyLocations).flat(),
+          ].flat()
+        );
+
         const pieceUnderAttackXY = { x, y };
+
         const newAllyLocations = { ...allyLocations };
 
         newAllyLocations[name] = newAllyLocations[name].filter(
@@ -105,13 +119,13 @@ const checkForPins = (
           const king = attackOnKing;
 
           const kingXY = { x: king.x, y: king.y };
-          // console.log(
-          //   "victim ->",
-          //   name,
-          //   attack,
-          //   "is pinned:",
-          //   attackOnKing ? true : false
-          // );
+          console.log(
+            "victim ->",
+            name,
+            attack,
+            "is pinned:",
+            attackOnKing ? true : false
+          );
 
           const moves = [
             getValidMovesOnPin(pieceUnderAttackXY, attackerXY),
@@ -175,3 +189,108 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
 
   return allPieceData;
 };
+
+const isKingOnSameDiagonal = (piece, locations) => {
+  // const { straightDirections, diagonalDirections } = createDirections("both");
+  // console.log(piece, straightDirections);
+  const straights = getBlockingPieces(
+    locations,
+    createDirections("straight"),
+    piece,
+    7,
+    piece.pieceOnTile.color,
+    false
+  );
+  const diagonals = getBlockingPieces(
+    locations,
+    createDirections("diagonal"),
+    piece,
+    7,
+    piece.pieceOnTile.color,
+    true
+  );
+
+  console.log(diagonals, straights);
+};
+
+const getBlockingPieces = (
+  allPieceData,
+  directions,
+  currentTile,
+  limit,
+  color,
+  diagonals
+) => {
+  const { up, down, left, right } = directions;
+  for (let i = 1; i <= limit; i++) {
+    const currentDir = diagonals
+      ? incrementDiagonals(i, currentTile)
+      : incrementStraights(i, currentTile);
+
+    try {
+      calculateBlockings(allPieceData, directions, currentDir, color);
+    } catch (e) {
+      console.error(e, currentTile, directions);
+    }
+  }
+
+  return {
+    blockingPieces: [
+      up.attackTile,
+      down.attackTile,
+      left.attackTile,
+      right.attackTile,
+    ].flat(),
+  };
+};
+
+const incrementDiagonals = (i, currentTile) => {
+  const { x, y } = currentTile;
+  return {
+    up: { x: x + i, y: y + i }, //upRight
+    down: { x: x - i, y: y + i }, //upLeft
+    right: { x: x + i, y: y - i }, //downRight
+    left: { x: x - i, y: y - i }, //downLeft
+  };
+};
+
+const incrementStraights = (i, currentTile) => {
+  const { x, y } = currentTile;
+  return {
+    up: { x, y: y + i },
+    down: { x, y: y - i },
+    right: { x: x + i, y },
+    left: { x: x - i, y },
+  };
+};
+
+function calculateBlockings(pieceLocations, directions, currentDir) {
+  const { up, down, left, right } = { ...directions };
+
+  const directionMappings = [
+    { direction: up, currentDirection: currentDir.up },
+    { direction: down, currentDirection: currentDir.down },
+    { direction: right, currentDirection: currentDir.right },
+    { direction: left, currentDirection: currentDir.left },
+  ];
+
+  for (const mapping of directionMappings) {
+    const { direction, currentDirection } = mapping;
+
+    if (isValidCoordinate(currentDirection.x, currentDirection.y)) {
+      pieceLocations.forEach((location) => {
+        if (
+          location.x === currentDirection.x &&
+          location.y === currentDirection.y &&
+          !direction.blocked
+        ) {
+          direction.blocked = true;
+          console.log(location);
+          direction.attackTile.push(location);
+        }
+      });
+    } else {
+      direction.blocked = true;
+    }
+  }
+}
