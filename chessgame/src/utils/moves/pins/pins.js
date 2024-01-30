@@ -96,6 +96,7 @@ const checkForPins = (
           ].flat()
         );
 
+        //TODO: MAKE SURE THE ATTACKED PIECE IS IN THE SAME DIAGONAL OR STRAIGHT AS THE KING.
         const pieceUnderAttackXY = { x, y };
 
         const newAllyLocations = { ...allyLocations };
@@ -166,7 +167,7 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
           value: pinnedValue,
           pieceOnTile: { name },
         },
-        allowedMoves, //TODO: MAKE SURE THIS IS THE ONLY MOVES BEING USED BY THE PIECE
+        allowedMoves,
       } = piece;
 
       allPieceData[name].forEach((piece, index) => {
