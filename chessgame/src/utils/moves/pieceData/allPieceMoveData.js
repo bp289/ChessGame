@@ -1,9 +1,9 @@
 import {
   createDirections,
   createPawnDirections,
-} from "../constants/directionConstants";
+} from "../../constants/directionConstants";
 
-import { isValidCoordinate } from "../constants/coordinateValidation";
+import { isValidCoordinate } from "../../constants/coordinateValidation";
 
 export const moveMap = {
   pawn: {

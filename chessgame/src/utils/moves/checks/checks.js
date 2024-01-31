@@ -1,4 +1,4 @@
-import { xyMatch } from "../constants/coordinateValidation";
+import { xyMatch } from "../../constants/coordinateValidation";
 
 export const checkForChecks = (
   currentLocation,

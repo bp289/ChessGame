@@ -1,5 +1,5 @@
-import { moveMap } from "./pieceMoves";
-import { checkForChecks } from "./checks";
+import { moveMap } from "./pieceData/allPieceMoveData";
+import { checkForChecks } from "./checks/checks";
 
 import { setPins } from "./pins/pins";
 export const legalMoves = (board) => {
