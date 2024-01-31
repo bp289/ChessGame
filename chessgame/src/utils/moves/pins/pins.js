@@ -36,6 +36,8 @@ const reducedPinAttacks = (
   enemyLocations,
   pieceLocations
 ) => {
+  const king = allyLocations.king[0];
+
   const { queens, rooks, bishops } = enemysPinAttacks;
   // const pieceInfo = { ...pieceLocations };
   let pieceData = { ...pieceLocations };
@@ -43,16 +45,24 @@ const reducedPinAttacks = (
     queens,
     allyLocations,
     enemyLocations,
-    "queen"
+    "queen",
+    king
   );
   pieceData = filterMovesFromPins(queenPins, pieceData);
-  const rookPins = checkForPins(rooks, allyLocations, enemyLocations, "rook");
+  const rookPins = checkForPins(
+    rooks,
+    allyLocations,
+    enemyLocations,
+    "rook",
+    king
+  );
   pieceData = filterMovesFromPins(rookPins, pieceData);
   const bishopPins = checkForPins(
     bishops,
     allyLocations,
     enemyLocations,
-    "bishop"
+    "bishop",
+    king
   );
   pieceData = filterMovesFromPins(bishopPins, pieceData);
 
@@ -63,9 +73,15 @@ const checkForPins = (
   pinningPieces,
   allyLocations,
   enemyLocations,
-  pieceName
+  attackingPieceName,
+  kingLocation
 ) => {
   const pins = {};
+
+  const allLocations = Object.values(allyLocations)
+    .flat()
+    .concat(Object.values(allyLocations).flat());
+
   for (let piece of pinningPieces) {
     const {
       attacks,
@@ -81,6 +97,9 @@ const checkForPins = (
 
     if (attacks.length > 0) {
       const pinnedPieces = attacks.reduce((totalPinningAttacks, attack) => {
+        if (!isKingOnSameDiagonal(attack, allLocations))
+          return totalPinningAttacks;
+
         const {
           pieceOnTile: { name },
           value: pieceUnderAttackValue,
@@ -88,15 +107,6 @@ const checkForPins = (
           y,
         } = attack;
 
-        const kingOnSameDiagonal = isKingOnSameDiagonal(
-          attack,
-          [
-            Object.values(allyLocations).flat(),
-            Object.values(enemyLocations).flat(),
-          ].flat()
-        );
-
-        //TODO: MAKE SURE THE ATTACKED PIECE IS IN THE SAME DIAGONAL OR STRAIGHT AS THE KING.
         const pieceUnderAttackXY = { x, y };
 
         const newAllyLocations = { ...allyLocations };
@@ -105,35 +115,30 @@ const checkForPins = (
           (currentPiece) => currentPiece.value !== pieceUnderAttackValue
         );
 
-        const movesWithoutPieceUnderAttack = moveMap[pieceName].findTiles(
+        const movesWithoutPieceUnderAttack = moveMap[
+          attackingPieceName
+        ].findTiles(
           piece.currentTile,
           Object.values(newAllyLocations).flat(),
           Object.values(enemyLocations).flat(),
           enemyColor
         );
 
-        const attackOnKing = movesWithoutPieceUnderAttack.attacks.find(
+        const attackOnKing = movesWithoutPieceUnderAttack.attacks.some(
           (attack) => attack.pieceOnTile.name === "king"
         );
 
         if (attackOnKing) {
-          const king = attackOnKing;
+          console.log("victim ->", name, attack, "is pinned:", attackOnKing);
 
-          const kingXY = { x: king.x, y: king.y };
-          console.log(
-            "victim ->",
-            name,
-            attack,
-            "is pinned:",
-            attackOnKing ? true : false
+          const moves = getValidMovesOnPin(
+            pieceUnderAttackXY,
+            attackerXY
+          ).concat(
+            getValidMovesOnPin(pieceUnderAttackXY, kingLocation).filter(
+              (moveLocation) => !xyMatch(moveLocation, kingLocation)
+            )
           );
-
-          const moves = [
-            getValidMovesOnPin(pieceUnderAttackXY, attackerXY),
-            getValidMovesOnPin(pieceUnderAttackXY, kingXY).filter(
-              ({ x, y }) => x !== kingXY.x && y !== kingXY.y
-            ),
-          ].flat();
 
           totalPinningAttacks.push({
             pinnedPiece: attack,
@@ -144,8 +149,6 @@ const checkForPins = (
         }
 
         return totalPinningAttacks;
-
-        // find the direction from which you are being attacked from
       }, []);
 
       if (pinnedPieces.length > 0) {
@@ -194,7 +197,7 @@ const filterMovesFromPins = (pinnedPieces, allPieceData) => {
 const isKingOnSameDiagonal = (piece, locations) => {
   // const { straightDirections, diagonalDirections } = createDirections("both");
   // console.log(piece, straightDirections);
-  const straights = getBlockingPieces(
+  const straights = findKing(
     locations,
     createDirections("straight"),
     piece,
@@ -202,7 +205,7 @@ const isKingOnSameDiagonal = (piece, locations) => {
     piece.pieceOnTile.color,
     false
   );
-  const diagonals = getBlockingPieces(
+  const diagonals = findKing(
     locations,
     createDirections("diagonal"),
     piece,
@@ -211,10 +214,10 @@ const isKingOnSameDiagonal = (piece, locations) => {
     true
   );
 
-  console.log(diagonals, straights);
+  return straights || diagonals;
 };
 
-const getBlockingPieces = (
+const findKing = (
   allPieceData,
   directions,
   currentTile,
@@ -222,27 +225,25 @@ const getBlockingPieces = (
   color,
   diagonals
 ) => {
-  const { up, down, left, right } = directions;
+  let kingMatch = false;
   for (let i = 1; i <= limit; i++) {
     const currentDir = diagonals
       ? incrementDiagonals(i, currentTile)
       : incrementStraights(i, currentTile);
 
     try {
-      calculateBlockings(allPieceData, directions, currentDir, color);
+      kingMatch = transverseDirections(
+        allPieceData,
+        directions,
+        currentDir,
+        color
+      );
     } catch (e) {
       console.error(e, currentTile, directions);
     }
   }
 
-  return {
-    blockingPieces: [
-      up.attackTile,
-      down.attackTile,
-      left.attackTile,
-      right.attackTile,
-    ].flat(),
-  };
+  return kingMatch;
 };
 
 const incrementDiagonals = (i, currentTile) => {
@@ -265,9 +266,9 @@ const incrementStraights = (i, currentTile) => {
   };
 };
 
-function calculateBlockings(pieceLocations, directions, currentDir) {
+function transverseDirections(pieceLocations, directions, currentDir, color) {
   const { up, down, left, right } = { ...directions };
-
+  let kingMatch = false;
   const directionMappings = [
     { direction: up, currentDirection: currentDir.up },
     { direction: down, currentDirection: currentDir.down },
@@ -277,21 +278,24 @@ function calculateBlockings(pieceLocations, directions, currentDir) {
 
   for (const mapping of directionMappings) {
     const { direction, currentDirection } = mapping;
-
+    if (kingMatch) break;
     if (isValidCoordinate(currentDirection.x, currentDirection.y)) {
-      pieceLocations.forEach((location) => {
-        if (
+      for (const location of pieceLocations) {
+        const locationMatch =
           location.x === currentDirection.x &&
           location.y === currentDirection.y &&
-          !direction.blocked
-        ) {
+          !direction.blocked;
+        if (locationMatch) {
           direction.blocked = true;
-          console.log(location);
-          direction.attackTile.push(location);
+          kingMatch =
+            location.pieceOnTile.color === color &&
+            location.pieceOnTile.name === "king";
+          if (kingMatch) break;
         }
-      });
+      }
     } else {
       direction.blocked = true;
     }
   }
+  return kingMatch;
 }
