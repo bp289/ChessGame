@@ -18,7 +18,10 @@ export default function Chessboard() {
   const [currentLegalMoves, setCurrentLegalMoves] = useState();
 
   //this is to prevent the legal moves being run every render
-  useMemo(() => setCurrentLegalMoves(legalMoves(startBoard)), []);
+  useMemo(
+    () => setCurrentLegalMoves(legalMoves(startBoard).pieceLocations),
+    []
+  );
 
   const [selectedTile, setSelectedTile] = useState();
   const [takenPieces, setTakenPieces] = useState({ white: [], black: [] });
@@ -53,7 +56,9 @@ export default function Chessboard() {
         destinationTile
       );
       setBoard(newBoard);
-      setCurrentLegalMoves(legalMoves([...newBoard]));
+
+      const { pieceLocations, checks } = legalMoves([...newBoard]);
+      setCurrentLegalMoves(pieceLocations);
       setSelectedTile(null);
 
       if (takenPiece) {

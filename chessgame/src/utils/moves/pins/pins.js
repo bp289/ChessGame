@@ -1,5 +1,5 @@
 import { moveMap } from "../pieceData/allPieceMoveData";
-import { getValidMovesOnPin } from "./pinCalcs";
+import { getMovesBlockingKing } from "../pieceData/TransversalData";
 import { isKingOnSameDiagonal } from "./pinCalcs";
 import { xyMatch } from "../../constants/coordinateValidation";
 
@@ -109,11 +109,11 @@ const checkForPins = (
           )
             return totalPinningAttacks;
 
-          const moves = getValidMovesOnPin(
+          const moves = getMovesBlockingKing(
             currentPieceUnderAttack,
             attackerXY
           ).concat(
-            getValidMovesOnPin(currentPieceUnderAttack, kingLocation).filter(
+            getMovesBlockingKing(currentPieceUnderAttack, kingLocation).filter(
               (moveLocation) => !xyMatch(moveLocation, kingLocation)
             )
           );

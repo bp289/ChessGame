@@ -1,5 +1,5 @@
 import { findCellType } from "./startBoard";
-export const showMovesOnBoard = ({ pieceLocations }, selectedTile, board) => {
+export const showMovesOnBoard = (pieceLocations, selectedTile, board) => {
   const { normalMoves, attackMoves } = getMoves(pieceLocations, selectedTile);
 
   return board.map((tile) => {
@@ -49,12 +49,11 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
         pieceOnTile: {},
         cellState: findCellType(tile.x, tile.y),
       };
-    } else {
-      return {
-        ...tile,
-        cellState: "neutral",
-      };
     }
+    return {
+      ...tile,
+      cellState: "neutral",
+    };
   });
 
   return {

@@ -1,5 +1,5 @@
 import { moveMap } from "./pieceData/allPieceMoveData";
-import { checkForChecks } from "./checks/checks";
+import { filterMovesDuringCheck, updateKingStatus } from "./checks/checks";
 
 import { setPins } from "./pins/pins";
 export const legalMoves = (board) => {
@@ -42,31 +42,7 @@ export const legalMoves = (board) => {
     "black"
   );
 
-  //calculate Checks
-  const checksOnWhite = checkForChecks(
-    pieceLocations.white.king[0].currentlyAt,
-    blackAttacks,
-    blackProtections,
-    blackMoves,
-    pieceLocations.white.king[0].legalMoves,
-    pieceLocations.white.king[0].legalAttacks
-  );
-  //console.log("white checks", checksOnWhite);
-
-  pieceLocations.white.king[0] = checksOnWhite.filteredKing;
-
-  const checksOnBlack = checkForChecks(
-    pieceLocations.black.king[0].currentlyAt,
-    whiteAttacks,
-    whiteProtections,
-    whiteMoves,
-    pieceLocations.black.king[0].legalMoves,
-    pieceLocations.black.king[0].legalAttacks
-  );
-
-  //console.log("black checks", checksOnBlack);
-
-  pieceLocations.black.king[0] = checksOnBlack.filteredKing;
+  //setting pin values
 
   pieceLocations = setPins(
     pieceLocations,
@@ -75,6 +51,41 @@ export const legalMoves = (board) => {
     pinningAttacksWhite,
     pinningAttacksBlack
   );
+
+  //calculate Checks
+  const checksOnWhite = updateKingStatus(
+    pieceLocations.white.king[0].currentlyAt,
+    blackAttacks,
+    blackProtections,
+    blackMoves,
+    pieceLocations.white.king[0].legalMoves,
+    pieceLocations.white.king[0].legalAttacks
+  );
+  //console.log("pieces checking white", checksOnWhite.piecesChecking);
+
+  pieceLocations.white.king[0] = checksOnWhite.filteredKing;
+
+  if (checksOnWhite.isInCheck) {
+    filterMovesDuringCheck(checksOnWhite, pieceLocations.white);
+  }
+
+  const checksOnBlack = updateKingStatus(
+    pieceLocations.black.king[0].currentlyAt,
+    whiteAttacks,
+    whiteProtections,
+    whiteMoves,
+    pieceLocations.black.king[0].legalMoves,
+    pieceLocations.black.king[0].legalAttacks
+  );
+
+  if (checksOnBlack.isInCheck) {
+    filterMovesDuringCheck(checksOnBlack, pieceLocations.black);
+  }
+
+  console.log("pieces checking black", checksOnBlack.piecesChecking);
+
+  pieceLocations.black.king[0] = checksOnBlack.filteredKing;
+
   return {
     pieceLocations: pieceLocations,
     checks: {
