@@ -33,6 +33,9 @@ const calculateDelta = (origin, destination) => {
 };
 
 export const getMovesBlockingKing = (pieceOrigin, destination) => {
+  if (!pieceOrigin.x || !pieceOrigin.y || !destination.x || !destination.y) {
+    throw new Error("both pieceOrigin and destination need an x or y");
+  }
   const moves = [];
   let { x: originX, y: originY } = pieceOrigin;
   let { x: deltaX, y: deltaY } = calculateDelta(pieceOrigin, destination);
