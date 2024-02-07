@@ -6,6 +6,10 @@
   background-color: #23272a;
 }
 
+body {
+  background-color: #23272a;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

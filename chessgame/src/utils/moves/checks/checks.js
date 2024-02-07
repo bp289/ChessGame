@@ -99,23 +99,49 @@ export const filterMovesDuringCheck = (kingCheckData, currentPieceMoves) => {
       x,
       y,
     } = attacker.attackingFrom;
-    console.log(attacker);
-    const piecesWithUpdatedMoves =
+    //console.log(attacker);
+    const allowedMoves =
       name === "rook" || name === "bishop" || name === "queen"
         ? getMovesBlockingKing(kingTile.currentlyAt, attacker.attackingFrom)
         : [];
 
     allAllowedAttacks[value] = { x, y, name };
-    allAllowedMoves[value] = { x, y, piecesWithUpdatedMoves };
+    allAllowedMoves[value] = { x, y, name, allowedMoves };
     // ? findBlocks({ ...currentPieceMoves }, attacker.attackingFrom, kingTile)
     // : findAttacks({ ...currentPieceMoves }, attacker.attackingFrom);
   });
 
+  if (piecesChecking.length > 1) {
+    const verifiedAllowedAttacks = [];
+    const verifiedAllowedMoves = [];
+    for (let attackKey in allAllowedAttacks) {
+      const attackToCheck = allAllowedAttacks[attackKey];
+      const currentAttackAllowed = verifyAttack(
+        attackToCheck,
+        allAllowedAttacks
+      );
+      if (currentAttackAllowed) verifiedAllowedAttacks.push(attackToCheck);
+    }
+  } else {
+  }
   //TODO: if there are multiple checks:
   //TODO: if a calculated valid attack exists also as a valid move for all keys in "allAllowedMoves", then its a valid
   //TODO: if a valid move exists as valid moves for all other keys of "allAllowedMoves", then its valid
-
   //TODO: when we obtain all valid attacks and moves, we can filter our current legal moves.
+};
+
+const verifyAttack = (moveToCheck, allAllowedMoves) => {
+  for (let moveKey in allAllowedMoves) {
+    const currentAllowedMoves = allAllowedMoves[moveKey];
+    const moveMatch = !currentAllowedMoves.find((move) =>
+      xyMatch(move, moveToCheck)
+    );
+    if (!moveMatch) {
+      return false;
+    }
+  }
+
+  return true;
 };
 
 // const findBlocks = (currentPieceMoves, attacker, kingTile) => {
