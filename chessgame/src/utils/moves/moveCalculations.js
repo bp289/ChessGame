@@ -61,13 +61,9 @@ export const legalMoves = (board) => {
     pieceLocations.white.king[0].legalMoves,
     pieceLocations.white.king[0].legalAttacks
   );
-  //console.log("pieces checking white", checksOnWhite.piecesChecking);
+  console.log("pieces checking white", checksOnWhite.piecesChecking);
 
   pieceLocations.white.king[0] = checksOnWhite.filteredKing;
-
-  if (checksOnWhite.isInCheck) {
-    filterMovesDuringCheck(checksOnWhite, pieceLocations.white);
-  }
 
   const checksOnBlack = updateKingStatus(
     pieceLocations.black.king[0].currentlyAt,
@@ -78,13 +74,22 @@ export const legalMoves = (board) => {
     pieceLocations.black.king[0].legalAttacks
   );
 
-  if (checksOnBlack.isInCheck) {
-    filterMovesDuringCheck(checksOnBlack, pieceLocations.black);
-  }
-
-  console.log("pieces checking black", checksOnBlack.piecesChecking);
-
   pieceLocations.black.king[0] = checksOnBlack.filteredKing;
+
+  if (checksOnWhite.isInCheck) {
+    pieceLocations.white = filterMovesDuringCheck(
+      checksOnWhite,
+      pieceLocations.white
+    );
+    console.log("pieces checking white", checksOnWhite.piecesChecking);
+  }
+  if (checksOnBlack.isInCheck) {
+    pieceLocations.black = filterMovesDuringCheck(
+      checksOnBlack,
+      pieceLocations.black
+    );
+    console.log("pieces checking black", checksOnBlack.piecesChecking);
+  }
 
   return {
     pieceLocations: pieceLocations,

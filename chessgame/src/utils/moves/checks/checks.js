@@ -13,7 +13,7 @@ export const updateKingStatus = (
   let filteredKingAttacks = [...kingsAttacks];
   let isInCheck = false;
   const piecesChecking = [];
-  //console.log("enemyAttaks", enemyAttacks);
+
   enemyAttacks.forEach((enemyAttack) => {
     for (const attack of enemyAttack.attacks) {
       if (xyMatch(attack, currentLocation)) {
@@ -92,6 +92,7 @@ export const filterMovesDuringCheck = (kingCheckData, currentPieceMoves) => {
 
   const allAllowedMoves = {};
   const allAllowedAttacks = {};
+
   piecesChecking.forEach((attacker) => {
     const {
       pieceOnTile: { name },
@@ -99,16 +100,13 @@ export const filterMovesDuringCheck = (kingCheckData, currentPieceMoves) => {
       x,
       y,
     } = attacker.attackingFrom;
-    //console.log(attacker);
     const allowedMoves =
       name === "rook" || name === "bishop" || name === "queen"
         ? getMovesBlockingKing(kingTile.currentlyAt, attacker.attackingFrom)
         : [];
 
     allAllowedAttacks[value] = { x, y, name };
-    allAllowedMoves[value] = { x, y, name, allowedMoves };
-    // ? findBlocks({ ...currentPieceMoves }, attacker.attackingFrom, kingTile)
-    // : findAttacks({ ...currentPieceMoves }, attacker.attackingFrom);
+    allAllowedMoves[value] = { x, y, name, moves: allowedMoves };
   });
 
   if (piecesChecking.length > 1) {
@@ -116,84 +114,74 @@ export const filterMovesDuringCheck = (kingCheckData, currentPieceMoves) => {
     const verifiedAllowedMoves = [];
     for (let attackKey in allAllowedAttacks) {
       const attackToCheck = allAllowedAttacks[attackKey];
-      const currentAttackAllowed = verifyAttack(
-        attackToCheck,
-        allAllowedAttacks
-      );
+      const currentAttackAllowed = verifyMove(attackToCheck, allAllowedMoves);
       if (currentAttackAllowed) verifiedAllowedAttacks.push(attackToCheck);
     }
+
+    const allowedMoveKeys = Object.values(allAllowedMoves);
+
+    for (let i = 1; i < allowedMoveKeys.length; i++) {
+      const moveToCheck = allowedMoveKeys[i];
+      const restOfAllowedMoves = allowedMoveKeys.toSpliced(i, 1);
+      const currentMoveAllowed = verifyMove(moveToCheck, restOfAllowedMoves);
+      if (currentMoveAllowed) verifiedAllowedMoves.push(currentMoveAllowed);
+    }
+    return filterMovesForEachPieceType(
+      currentPieceMoves,
+      verifiedAllowedMoves,
+      verifiedAllowedAttacks
+    );
   } else {
+    const verifiedAllowedAttacks = Object.values(allAllowedAttacks);
+    const verifiedAllowedMoves = Object.values(allAllowedMoves)[0].moves;
+
+    return filterMovesForEachPieceType(
+      currentPieceMoves,
+      verifiedAllowedMoves,
+      verifiedAllowedAttacks
+    );
   }
-  //TODO: if there are multiple checks:
-  //TODO: if a calculated valid attack exists also as a valid move for all keys in "allAllowedMoves", then its a valid
-  //TODO: if a valid move exists as valid moves for all other keys of "allAllowedMoves", then its valid
-  //TODO: when we obtain all valid attacks and moves, we can filter our current legal moves.
 };
 
-const verifyAttack = (moveToCheck, allAllowedMoves) => {
+const verifyMove = (moveToCheck, allAllowedMoves) => {
   for (let moveKey in allAllowedMoves) {
-    const currentAllowedMoves = allAllowedMoves[moveKey];
-    const moveMatch = !currentAllowedMoves.find((move) =>
-      xyMatch(move, moveToCheck)
-    );
+    const allowedMoves = allAllowedMoves[moveKey].moves;
+    const moveMatch = allowedMoves.find((move) => xyMatch(move, moveToCheck));
     if (!moveMatch) {
       return false;
     }
   }
-
   return true;
 };
 
-// const findBlocks = (currentPieceMoves, attacker, kingTile) => {
-//   const newPieceMoves = {};
-//   const movesBlockingKing = getMovesBlockingKing(
-//     kingTile.currentlyAt,
-//     attacker
-//   );
+const filterMovesForEachPieceType = (
+  pieceMoves,
+  allowedMoves,
+  allowedAttacks
+) => {
+  const result = {};
+  for (const pieceType in pieceMoves) {
+    const newMoves = pieceMoves[pieceType].map((piece) => {
+      if (pieceType === "king") return pieceType;
+      const newLegalMoves = piece.legalMoves?.filter((moveToCheck) =>
+        allowedMoves.find((move) => xyMatch(moveToCheck, move))
+      );
 
-//   for (const pieceType in currentPieceMoves) {
-//     if (pieceType === "king") continue;
+      const newLegalAttacks = piece.legalAttacks?.filter((moveToCheck) =>
+        allowedAttacks.find((allowedAttack) =>
+          xyMatch(moveToCheck, allowedAttack)
+        )
+      );
 
-//     newPieceMoves[pieceType] = currentPieceMoves[pieceType].map((piece) => {
-//       const updatedLegalAttacks = onSameDiagonalAsKing(
-//         piece.legalAttacks,
-//         movesBlockingKing
-//       );
-//       const updatedLegalMoves = onSameDiagonalAsKing(
-//         piece.legalMoves,
-//         movesBlockingKing
-//       );
+      return {
+        ...piece,
+        legalAttacks: newLegalAttacks,
+        legalMoves: newLegalMoves,
+      };
+    });
 
-//       return {
-//         legalMoves: updatedLegalMoves,
-//         legalAttacks: updatedLegalAttacks,
-//         ...piece,
-//       };
-//     });
-//   }
-//   return newPieceMoves;
-// };
+    result[pieceType] = newMoves;
+  }
 
-const onSameDiagonalAsKing = (currentMoves, movesBlocking) =>
-  currentMoves.filter((move) =>
-    movesBlocking.find((moveBlocking) => xyMatch(move, moveBlocking))
-  );
-
-// const findAttacks = (currentPieceMoves, attacker) => {
-//   const newPieceMoves = {};
-//   for (const pieceType in currentPieceMoves) {
-//     if (pieceType === "king") continue;
-//     newPieceMoves[pieceType] = currentPieceMoves[pieceType].map((piece) => {
-//       const attackThatTakesAttacker = piece.legalAttacks.find((legalAttack) =>
-//         xyMatch(legalAttack, attacker)
-//       );
-
-//       return {
-//         legalMoves: [],
-//         legalAttacks: attackThatTakesAttacker ? [attackThatTakesAttacker] : [],
-//         ...piece,
-//       };
-//     });
-//   }
-//   return newPieceMoves;
-// };
+  return result;
+};
