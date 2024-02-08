@@ -14,6 +14,7 @@ const startBoard = initializeBoard();
 
 export default function Chessboard() {
   const [turn, toggleTurn] = useTurn();
+  const [checkTile, setCheckTile] = useState();
   const [board, setBoard] = useState(startBoard);
   const [currentLegalMoves, setCurrentLegalMoves] = useState();
 
@@ -50,12 +51,11 @@ export default function Chessboard() {
 
   const handlePieceMove = useCallback(
     (destinationTile) => {
-      const { newBoard, takenPiece } = getBoardAfterMove(
+      const { newBoard, takenPiece, kingTileIndex } = getBoardAfterMove(
         board,
         selectedTile,
         destinationTile
       );
-      setBoard(newBoard);
 
       const { pieceLocations, checks } = legalMoves([...newBoard]);
       setCurrentLegalMoves(pieceLocations);
@@ -66,6 +66,13 @@ export default function Chessboard() {
         setTakenPieces({ ...takenPieces });
       }
       toggleTurn();
+      if (checks.isInCheck) {
+        const { color, piecesChecking } = checks;
+        console.log(newBoard[kingTileIndex[color]].cellState);
+        newBoard[kingTileIndex[color]].cellState = "check";
+      }
+
+      setBoard(newBoard);
     },
     [board, selectedTile, toggleTurn, takenPieces]
   );
@@ -82,6 +89,7 @@ export default function Chessboard() {
             selectedTile={selectedTile}
             movePiece={handlePieceMove}
             deSelect={handleDeSelect}
+            checkTile={checkTile}
           />
         ))}
       </div>

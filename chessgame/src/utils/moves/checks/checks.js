@@ -162,7 +162,7 @@ const filterMovesForEachPieceType = (
   const result = {};
   for (const pieceType in pieceMoves) {
     const newMoves = pieceMoves[pieceType].map((piece) => {
-      if (pieceType === "king") return pieceType;
+      if (pieceType === "king") return piece;
       const newLegalMoves = piece.legalMoves?.filter((moveToCheck) =>
         allowedMoves.find((move) => xyMatch(moveToCheck, move))
       );

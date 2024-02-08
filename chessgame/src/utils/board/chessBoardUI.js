@@ -6,7 +6,7 @@ export const showMovesOnBoard = (pieceLocations, selectedTile, board) => {
     if (tile.value === selectedTile.value) {
       return {
         ...tile,
-        cellState: `selected`,
+        cellState: "selected",
       };
     } else {
       for (let normalMove of normalMoves) {
@@ -25,13 +25,19 @@ export const showMovesOnBoard = (pieceLocations, selectedTile, board) => {
           };
         }
       }
-      return { ...tile, cellState: `neutral` };
+      return {
+        ...tile,
+        cellState: tile.cellState === "check" ? "check" : "neutral",
+      };
     }
   });
 };
 export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
-  const newBoard = board.map((tile) => {
-    // console.log(tileToMoveTo === tile, tile);
+  const kingTileIndex = { white: 0, black: 0 };
+  const newBoard = board.map((tile, index) => {
+    if (tile.pieceOnTile.name === "king")
+      kingTileIndex[tile.pieceOnTile.color] = index;
+
     if (tileToMoveTo.value === tile.value) {
       if (
         tileToMoveTo.cellState === "movable" ||
@@ -47,7 +53,7 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
       return {
         ...tile,
         pieceOnTile: {},
-        cellState: findCellType(tile.x, tile.y),
+        cellState: "neutral",
       };
     }
     return {
@@ -59,6 +65,7 @@ export const getBoardAfterMove = (board, tileToMoveFrom, tileToMoveTo) => {
   return {
     newBoard,
     takenPiece: tileToMoveTo.pieceOnTile.name ? tileToMoveTo.pieceOnTile : null,
+    kingTileIndex,
   };
 };
 
