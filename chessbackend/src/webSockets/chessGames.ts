@@ -5,19 +5,15 @@ import webSocket from "ws";
 interface Rooms {
   [key: string]: webSocket[];
 }
+
+interface RoomData {
+  [key: string]: string;
+}
 export const router = express.Router();
 
-const rooms: Rooms = {};
-
-const broadCast = (roomId: string, message: string, ws: webSocket) => {
-  rooms[roomId].forEach((client: webSocket) => {
-    if (client != ws && client.readyState === client.OPEN) {
-      client.send(message);
-    }
-  });
-};
-
 export const mountChessWs = () => {
+  const rooms: Rooms = {};
+  const roomData: RoomData = {};
   router.ws("/game", (ws: webSocket, req: Request) => {
     console.log("socket", req.query);
 
@@ -25,22 +21,39 @@ export const mountChessWs = () => {
 
     if (!rooms[roomId]) {
       rooms[roomId] = [];
+      roomData[roomId] = "";
     }
 
-    console.log(`New WebSocket connection to room "${roomId}"`);
-    rooms[roomId].push(ws);
+    if (rooms[roomId].length < 2) {
+      console.log(`New WebSocket connection to room "${roomId}"`);
+      rooms[roomId].push(ws);
+    }
 
     ws.on("message", function (msg: string) {
       console.log(`said:${msg}`);
-      broadCast(roomId, `you said:${msg}`, ws);
+      roomData[roomId] = msg;
+      broadCast(rooms[roomId], `you said:${msg}`, ws);
+      console.log(roomData[roomId]);
     });
 
     ws.on("close", () => {
       const index: number = rooms[roomId].indexOf(ws);
       if (index !== -1) {
         rooms[roomId].splice(index, 1);
-        console.log(`Connection closed in room "${roomId}"`);
+        console.log(`Connection closed in room "${roomId}, index ${index}"`);
+        if (!rooms[roomId].length) {
+          delete rooms[roomId];
+          delete roomData[roomId];
+        }
       }
     });
+  });
+};
+
+const broadCast = (room: webSocket[], message: string, ws: webSocket) => {
+  room.forEach((client: webSocket) => {
+    if (client != ws && client.readyState === client.OPEN) {
+      client.send(message);
+    }
   });
 };

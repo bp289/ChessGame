@@ -15,7 +15,7 @@ const createApp = () => {
   mountChessWs();
   app.use("/ws-stuff", chessGameRouter);
   app.get("/", (req: Request, res: Response) => {
-    res.send("Home Server");
+    res.send("Welcome");
   });
   return app;
 };
